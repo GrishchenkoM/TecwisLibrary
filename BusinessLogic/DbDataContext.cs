@@ -8,7 +8,7 @@ namespace BusinessLogic
         public DbDataContext() : base("DefaultConnection")
         { }
 
-        public DbSet<Author> Authors { get; set; }
-        public DbSet<Book> Books { get; set; }
+        public virtual DbSet<Author> Authors { get; set; }
+        public virtual DbSet<Book> Books { get; set; }
     }
 }
