@@ -1,19 +1,18 @@
 ﻿using BusinessLogic.Repositories;
-using Core.Entities;
 
 namespace BusinessLogic
 {
     public interface IDataManager
     {
-        Repository<Author> AuthorRepository { get; }
-        Repository<Book> BookRepository { get; }
+        AuthorRepository Authors { get; }
+        BookRepository Books { get; }
     }
     
     public class DataManager : IDataManager
     {
         public DataManager(
-            Repository<Author> authorRepository, 
-            Repository<Book> bookRepository, 
+            AuthorRepository authorRepository,
+            BookRepository bookRepository, 
             DbDataContext context)
         {
             _authorRepository = authorRepository;
@@ -21,11 +20,11 @@ namespace BusinessLogic
             _context = context;
         }
 
-        public Repository<Author> AuthorRepository => _authorRepository ?? new AuthorRepository(_context);
-        public Repository<Book> BookRepository => _bookRepository ?? new BookRepository(_context);
+        public AuthorRepository Authors => _authorRepository ?? new Authors(_context);
+        public BookRepository Books => _bookRepository ?? new Books(_context);
 
-        private readonly Repository<Author> _authorRepository;
-        private readonly Repository<Book> _bookRepository;
+        private readonly AuthorRepository _authorRepository;
+        private readonly BookRepository _bookRepository;
         private readonly DbDataContext _context;
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Web.Http;
 using BusinessLogic;
 using Web.Models.EntityModels;
@@ -15,7 +14,7 @@ namespace Web.Controllers
         {
             try
             {
-                var model = DataManager.AuthorRepository.Get();
+                var model = DataManager.Authors.Get();
                 if (model != null && model.Count > 0)
                     return Ok(model);
 
@@ -32,7 +31,7 @@ namespace Web.Controllers
             try
             {
                 var entity = ModelFactory.Create(model);
-                var createdEntity = DataManager.AuthorRepository.Create(entity);
+                var createdEntity = DataManager.Authors.Create(entity);
 
                 if (createdEntity != null)
                 {
@@ -53,7 +52,7 @@ namespace Web.Controllers
             try
             {
                 var entity = ModelFactory.Create(model);
-                var updatedEntity = DataManager.AuthorRepository.Update(entity);
+                var updatedEntity = DataManager.Authors.Update(entity);
 
                 if (updatedEntity != null)
                 {
@@ -73,9 +72,9 @@ namespace Web.Controllers
         {
             try
             {
-                var entity = DataManager.AuthorRepository.Get().Where(x=>x.Id == id).ToList()[0];
+                var entity = DataManager.Authors.Get(id);
                 if (entity != null)
-                    DataManager.AuthorRepository.Delete(entity);
+                    DataManager.Authors.Delete(entity);
                 else
                     return NotFound();
                 

@@ -7,7 +7,6 @@ using Autofac.Integration.Mvc;
 using Autofac.Integration.WebApi;
 using BusinessLogic;
 using BusinessLogic.Repositories;
-using Core.Entities;
 
 namespace Web.IoC
 {
@@ -27,8 +26,8 @@ namespace Web.IoC
             builder.RegisterType<DbDataContext>().As<DbDataContext>().WithParameter("DefaultConnection",
                                                    ConfigurationManager.ConnectionStrings[1].ConnectionString);
 
-            builder.RegisterType<AuthorRepository>().As<Repository<Author>>();
-            builder.RegisterType<BookRepository>().As<Repository<Book>>();
+            builder.RegisterType<Authors>().As<AuthorRepository>();
+            builder.RegisterType<Books>().As<BookRepository>();
             
 
             builder.RegisterType<DataManager>().As<IDataManager>();

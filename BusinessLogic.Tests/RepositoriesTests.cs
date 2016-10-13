@@ -50,7 +50,7 @@ namespace BusinessLogic.Tests
         public void GetBookTest()
         {
             // act
-            var repo = new BookRepository(_mockContext.Object);
+            var repo = new Books(_mockContext.Object);
             var obj = repo.Get(0);
 
             // assert
@@ -64,7 +64,7 @@ namespace BusinessLogic.Tests
         public void GetAuthorTest()
         {
             // act
-            var repo = new AuthorRepository(_mockContext.Object);
+            var repo = new Authors(_mockContext.Object);
             var obj = repo.Get(0);
 
             // assert
