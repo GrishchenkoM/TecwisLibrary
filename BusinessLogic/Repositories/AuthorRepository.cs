@@ -22,4 +22,10 @@ namespace BusinessLogic.Repositories
 
         private readonly DbDataContext _context;
     }
+
+    public class Authors : AuthorRepository
+    {
+        public Authors(DbDataContext context) : base(context)
+        { }
+    }
 }

@@ -22,4 +22,10 @@ namespace BusinessLogic.Repositories
 
         private readonly DbDataContext _context;
     }
+
+    public class Books : BookRepository
+    {
+        public Books(DbDataContext context) : base(context)
+        { }
+    }
 }
