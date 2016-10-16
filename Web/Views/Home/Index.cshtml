@@ -1,24 +1,340 @@
-﻿<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
-    <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
+﻿@{
+    ViewBag.Title = "Home Page";
+    //var ajaxBooks = new AjaxOptions
+    //{
+    //    UpdateTargetId = "Books",
+    //    Url = Url.Action("GetBooks")
+    //};
+    //var ajaxAuthors = new AjaxOptions
+    //{
+    //    UpdateTargetId = "Authors",
+    //    Url = Url.Action("GetAuthors")
+    //};
+    var ajaxSearch = new AjaxOptions()
+    {
+        HttpMethod = "GET",
+        InsertionMode = InsertionMode.Replace,
+        UpdateTargetId = ""
+    };
+}
+<script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+<br /><br />
 <div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
-        a broad range of clients, including browsers and mobile devices. ASP.NET Web API
-        is an ideal platform for building RESTful applications on the .NET Framework.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
+
+    @CreateNavTabs()
+
+    <br />
+
+    <div class="tab-pane fade active in" id="bookTable">
+
+        <div class="col-md-1">
+            @*Create Book Button*@
+            <input type="submit" id="createBook" value="New Book" onclick="NewBookView()" />
+        </div>
+
+        <div class="col-md-8">
+
+            @*Table*@
+            <div id="myTabContent1" class="tab-content">
+
+                
+                    <div id="Books">
+                        @*@Html.Action("GetBooks")*@
+                    </div>
+                
+
+                @* create modal view *@
+                <div id="modBookDialog" class="modal fade">
+                    <div id="dialogBookContent" class="modal-dialog"></div>
+                </div>
+                
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+            @*TestBox for searching*@
+            <div>
+                @using (Ajax.BeginForm("Search", "Home", ajaxSearch))
+                {
+                    <span>
+                        <input type="text" name="search" data-autocomplete="true" />
+                        &nbsp;
+                        <input type="submit" value="Search" />
+                    </span>
+                }
+            </div>
+        </div>
+
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
+
+
+    <div class="tab-pane fade" id="authorTable">
+
+        <div class="col-md-2">
+            @*Create Author Button*@
+            <input type="submit" id="createAuthor" value="New Author" onclick="NewAuthorView()" />
+        </div>
+
+        <div class="col-md-10">
+
+            @*Table*@
+            <div id="myTabContent" class="tab-content">
+
+                
+                    <div id="Authors">
+                        @*@Html.Action("GetAuthors")*@
+                    </div>
+                
+
+                @* create modal view *@
+                <div id="modAuthorDialog" class="modal fade">
+                    <div id="dialogAuthorContent" class="modal-dialog"></div>
+                </div>
+                
+            </div>
+
+        </div>
+
+
     </div>
 </div>
+
+
+@helper CreateNavTabs()
+{
+    <ul id="myTab" class="nav nav-tabs">
+        <li class="active"><a href="#bookTable" data-toggle="tab">Books</a></li>
+        <li class=""><a href="#authorTable" data-toggle="tab">Authors</a></li>
+    </ul>
+}
+
+
+
+<script>
+    function Update() {
+        function displayBooks(data) {
+            var div = $("#Books");
+            div.empty();
+
+            var tbl = document.createElement('table');
+            //tbl.style.width = '100%';
+            //tbl.setAttribute('border', '1');
+            tbl.setAttribute('class', 'table color_table');
+            tbl.setAttribute('id', 'bookTab');
+
+
+            var thead = document.createElement('thead');
+
+            var tr = document.createElement('tr');
+
+            var th = document.createElement('th');
+            th.appendChild(document.createTextNode('Name'));
+            tr.appendChild(th);
+            th = document.createElement('th');
+            th.appendChild(document.createTextNode('Year'));
+            tr.appendChild(th);
+            th = document.createElement('th');
+            th.appendChild(document.createTextNode('Author'));
+            tr.appendChild(th);
+
+            thead.appendChild(tr);
+
+            tbl.appendChild(thead);
+
+            console.log(data.ContentModels.length);
+            var tbdy = document.createElement('tbody');
+
+            for (var i = 0; i < data.ContentModels.length; ++i) {
+                tr = document.createElement('tr');
+                tr.setAttribute('id', data.ContentModels[i].BookId);
+
+                var td = document.createElement('td');
+                td.appendChild(document.createTextNode(data.ContentModels[i].BookName));
+                tr.appendChild(td);
+
+                td = document.createElement('td');
+                td.appendChild(document.createTextNode(data.ContentModels[i].Year));
+                tr.appendChild(td);
+
+                td = document.createElement('td');
+                td.appendChild(document.createTextNode(data.ContentModels[i].AuthorName));
+                tr.appendChild(td);
+
+                tbdy.appendChild(tr);
+            }
+
+            tbl.appendChild(tbdy);
+            $("#Books").append(tbl);
+        }
+
+        function displayAuthors(data) {
+            var div = $("#Authors");
+            div.empty();
+
+            var tbl = document.createElement('table');
+            //tbl.style.width = '100%';
+            //tbl.setAttribute('border', '1');
+            tbl.setAttribute('class', 'table color_table');
+            tbl.setAttribute('id', 'authorTab');
+
+
+            var thead = document.createElement('thead');
+
+            var tr = document.createElement('tr');
+
+            var th = document.createElement('th');
+            th.appendChild(document.createTextNode('Name'));
+            tr.appendChild(th);
+
+            thead.appendChild(tr);
+
+            tbl.appendChild(thead);
+
+            var tbdy = document.createElement('tbody');
+
+            for (var i = 0; i < data.ContentModels.length; ++i) {
+                tr = document.createElement('tr');
+                tr.setAttribute('id', data.ContentModels[i].AuthorId);
+
+                var td = document.createElement('td');
+                td.appendChild(document.createTextNode(data.ContentModels[i].AuthorName));
+                tr.appendChild(td);
+
+                tbdy.appendChild(tr);
+            }
+
+            tbl.appendChild(tbdy);
+            $("#Authors").append(tbl);
+        }
+
+        $.ajax({
+            url: '/api/content/GetBooks',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                displayBooks(data);
+            }
+        });
+
+        $.ajax({
+            url: '/api/content/GetAuthors',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                displayAuthors(data);
+            }
+        });
+    }
+
+    $(Document).ready(function() {
+        Update();
+    });
+
+
+    function NewBookView() {
+        $(function () {
+            $.ajax({
+                url: '@Url.Action("NewBookView", "Home")',
+                type: 'POST',
+                success: function (data) {
+                    $('#dialogBookContent').html(data);
+                    $('#modBookDialog').modal('show');
+                }
+            });
+        });
+    }
+
+    function NewAuthorView() {
+        $(function () {
+            $.ajax({
+                url: '@Url.Action("NewAuthorView", "Home")',
+                type: 'POST',
+                success: function (data) {
+                    $('#dialogAuthorContent').html(data);
+                    $('#modAuthorDialog').modal('show');
+                }
+            });
+        });
+    }
+
+    function UpdateIndexContent(model, modDialogId) {
+        console.log("in UpdateIndexContent func");
+
+        if (modDialogId != null) {
+            $(modDialogId).modal('hide');
+        } else {
+            $('#modDialog').modal('hide');
+        }
+
+        try {
+            UpdateContent();
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    function UpdateContent(page) {
+        $(function () {
+            console.log("in UpdateContent");
+
+            //var pageNumber = page;
+            //var viewModel = {
+            //    page: pageNumber
+            //}
+
+            Update();
+        });
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@*<div class="jumbotron">
+            <h1>ASP.NET</h1>
+            <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
+            <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <h2>Getting started</h2>
+                <p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
+                a broad range of clients, including browsers and mobile devices. ASP.NET Web API
+                is an ideal platform for building RESTful applications on the .NET Framework.</p>
+                <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
+            </div>
+            <div class="col-md-4">
+                <h2>Get more libraries</h2>
+                <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
+                <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
+            </div>
+            <div class="col-md-4">
+                <h2>Web Hosting</h2>
+                <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+                <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
+            </div>
+        </div>*@
