@@ -57,17 +57,10 @@ namespace Web.Models
                     }
                     else
                     {
-                        foreach (var a in authors)
+                        list = authors.Select(a => new ContentModel()
                         {
-                            list = new List<ContentModel>();
-                            var model = new ContentModel()
-                            {
-                                AuthorId = a.Id,
-                                AuthorName = a.Name
-                            };
-
-                            list.Add(model);
-                        }
+                            AuthorId = a.Id, AuthorName = a.Name
+                        }).ToList();
                     }
                 }
 

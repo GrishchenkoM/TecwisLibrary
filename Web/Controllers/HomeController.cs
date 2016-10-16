@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.ServiceModel.Web;
-using System.Web;
-using System.Web.Mvc;
-using System.Web.UI;
-using Web.Models;
+﻿using System.Web.Mvc;
 
 namespace Web.Controllers
 {
@@ -19,9 +11,12 @@ namespace Web.Controllers
             return View();
         }
 
-        public ActionResult NewBookView()
+        public ActionResult NewBookView(int? index)
         {
-            return View("_CreateBook");
+            if(index != null)
+                return View("_ManageBook", index);
+
+            return View("_ManageBook", -1);
         }
     }
 }

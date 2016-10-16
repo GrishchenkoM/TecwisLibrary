@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using BusinessLogic;
 using Core.Entities;
 using Web.Models;
-using Web.Models.EntityModels;
 
 namespace Web.Controllers
 {
@@ -22,11 +18,38 @@ namespace Web.Controllers
         {
             try
             {
+                ArrayList list;
+
                 var books = DataManager.Books.Get();
                 var authors = DataManager.Authors.Get();
+                list = new ArrayList() {books, authors};
                 
-                var model = ModelFactory.Create(new ArrayList() { books, authors });
-                
+                var model = ModelFactory.Create(list);
+                if (model.ContentModels != null && model.ContentModels.Count > 0)
+                    return Ok(model);
+
+                return InternalServerError(new Exception("Database is empty."));
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+        [Route("api/content/GetBooks")]
+        public IHttpActionResult GetBooks(int? index)
+        {
+            try
+            {
+                ArrayList list = null;
+                if (index != null)
+                {
+                    var book = DataManager.Books.Get((int)index);
+                    var author = DataManager.Authors.Get(book.AuthorId);
+                    list = new ArrayList() { book, author };
+                }
+
+                var model = ModelFactory.Create(list);
+
                 if (model.ContentModels != null && model.ContentModels.Count > 0)
                     return Ok(model);
 
@@ -101,43 +124,66 @@ namespace Web.Controllers
             }
         }
 
-        //public IHttpActionResult Put([FromBody] AuthorModel model)
-        //{
-        //    try
-        //    {
-        //        var entity = ModelFactory.Create(model);
-        //        var updatedEntity = DataManager.Authors.Update(entity);
+        public IHttpActionResult Put([FromBody] ContentModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        //        if (updatedEntity != null)
-        //        {
-        //            var entityModel = ModelFactory.Create(updatedEntity);
-        //            return Ok(entityModel);
-        //        }
+            Author authorModel = null;
+            Book bookModel = null;
 
-        //        return InternalServerError(new Exception("Recording has not created"));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return InternalServerError(ex);
-        //    }
-        //}
+            try
+            {
+                var list = ModelFactory.Create(new ViewModel() { ContentModel = model });
 
-        //public IHttpActionResult Delete(int id)
-        //{
-        //    try
-        //    {
-        //        var entity = DataManager.Authors.Get(id);
-        //        if (entity != null)
-        //            DataManager.Authors.Delete(entity);
-        //        else
-        //            return NotFound();
+                foreach (var unit in list)
+                {
+                    if (unit is Book)
+                        bookModel = unit as Book;
+                    if (unit is Author)
+                        authorModel = unit as Author;
+                }
 
-        //        return Ok();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return InternalServerError(ex);
-        //    }
-        //}
+                if (authorModel != null)
+                {
+                    authorModel = authorModel.Id == -1
+                        ? DataManager.Authors.Create(authorModel)
+                        : DataManager.Authors.Get().Where(x => x.Name.Equals(authorModel.Name)).ToList()[0];
+
+                    if (bookModel != null)
+                    {
+                        bookModel.AuthorId = authorModel.Id;
+                        bookModel = DataManager.Books.Update(bookModel);
+
+                        var entityModel = ModelFactory.Create(new ArrayList() { bookModel, authorModel });
+                        return Ok(entityModel);
+                    }
+                }
+
+                return InternalServerError(new Exception("Recording has not created"));
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+        
+        public IHttpActionResult Delete(int id)
+        {
+            try
+            {
+                var entity = DataManager.Books.Get(id);
+                if (entity != null)
+                    DataManager.Books.Delete(entity);
+                else
+                    return NotFound();
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
     }
 }

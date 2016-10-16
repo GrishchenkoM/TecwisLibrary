@@ -15,3 +15,8 @@ select,
 textarea {
     max-width: 280px;
 }
+
+#authorTab, #bookTab {
+    cursor: pointer;
+}
+.selected{ background: silver;}
