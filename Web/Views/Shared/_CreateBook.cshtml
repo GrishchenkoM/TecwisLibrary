@@ -1,0 +1,174 @@
+﻿@model dynamic
+@{ Layout = null;}
+
+<script>
+    function CreateBook(obj) {
+        
+
+        var authorNameSelect = $('#authorNameSelect').val();
+        var authorNameInput = $('#authorNameInput').val().replace(new RegExp('\n', 'g'), '').replace(new RegExp(' ', 'g'), '');
+        var authorName;
+        var authorId = -1;
+        authorName = authorNameInput;
+        if (authorNameInput == authorNameSelect) {
+            authorName = authorNameInput;
+            authorId = -2;
+        }
+
+        var bookId = $('#bookId').val();
+        if (bookId != '') bookId = parseInt($('#bookId').val());
+        else bookId = -1;
+
+        var viewModel = {
+            BookId: bookId,
+            BookName: $('#bookName').val(),
+            AuthorId: authorId,
+            AuthorName: authorName,
+            Year: $('#bookYear').val()
+        }
+
+        $.ajax({
+            url: '/api/content',
+            type: 'POST',
+            data: viewModel,
+            success: function (model) {
+                window.UpdateIndexContent(model);
+            }
+        });
+    }
+
+    function displayButton() {
+        var book = $('#bookName').val().replace(new RegExp('\n', 'g'), '').replace(new RegExp(' ', 'g'), '');
+        var year = $('#bookYear').val().replace(new RegExp('\n', 'g'), '').replace(new RegExp(' ', 'g'), '');
+        var authorNameSelect = $('#authorNameSelect').val();
+        console.log(authorNameSelect);
+        var authorNameInput = $('#authorNameInput').val().replace(new RegExp('\n', 'g'), '').replace(new RegExp(' ', 'g'), '');
+        if (book !== '' && year !== '' && authorNameInput !== '') {
+            $('#userBtn').css("display", "block");
+        } else {
+            $('#userBtn').css("display", "none");
+        }
+    }
+
+    $(document).ready(function () {
+        console.log("$(document).ready func");
+
+        $('#content').keyup(function () { displayButton ();});
+
+        displayButton();
+
+        $.ajax({
+            url: '/api/author',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                var sel = document.getElementById('authorNameSelect');
+                var opt = null;
+
+                opt = document.createElement('option');
+                opt.value = '';
+                opt.id = -1;
+                opt.innerHTML = '';
+                sel.appendChild(opt);
+                for (var i = 0; i < data.length; ++i) {
+
+                    opt = document.createElement('option');
+                    opt.value = data[i].Name;
+                    opt.id = data[i].Id;
+                    opt.innerHTML = data[i].Name;
+                    sel.appendChild(opt);
+                }
+            }
+        });
+
+        var select = document.getElementById("authorNameSelect");
+        select.addEventListener("click",function () {
+            $('#authorNameInput').val($('#authorNameSelect').val());
+            displayButton();
+        }, false);
+        var input = document.getElementById("authorNameInput");
+        input.addEventListener("change", function () {
+            displayButton();
+        }, false);
+
+        //try {
+        //    var objSel = document.getElementById("managerlist");
+        //    if (objSel.options.length > 1) {
+
+        //        $('textarea').keyup(function () {
+        //            var text = $('textarea').val().replace(new RegExp('\n', 'g'), '').replace(new RegExp(' ', 'g'), '');
+        //            if (text !== '') {
+        //                $('#userBtn').css("display", "block");
+        //            } else {
+        //                $('#userBtn').css("display", "none");
+        //            }
+        //        });
+
+        //    } else {
+        //        $('#userBtn').css("display", "none");
+        //        $('#result').text("В системе не зарегистрировано ни одного менеджера.");
+        //    }
+        //} catch (e) {
+        //    $('#userBtn').css("display", "none");
+        //    $('#result').text("В системе не зарегистрировано ни одного менеджера.");
+        //}
+
+
+        //$('#modDialog').on('hidden.bs.modal', function () { });
+    });
+
+</script>
+
+
+<div class="modal-content">
+    <div class="modal-header">
+        <button class="close" data-dismiss="modal" area-hidden="true">X</button>
+        <h4>Create Book</h4>
+    </div>
+    <div class="modal-body">
+        <dl class="dl-horizontal" id="content">
+
+            <dt>Name of Book</dt>
+            <dd><fieldset><input type="text" id="bookName" name="sql" required/></fieldset></dd>
+
+            <dd><br /></dd>
+
+            <dt>Year</dt>
+            <dd><input type="number" id="bookYear" required/></dd>
+
+            <dd><br/></dd>
+
+            <dt>Author</dt>
+            <dd><input type="text" id="authorNameInput" required/></dd>
+            <dd><select id="authorNameSelect"></select></dd>
+
+            <dd><input type="text" id="bookId" style="display: none"/></dd>
+            <dd><br /></dd>
+
+            <dd><input type="submit" id="userBtn" value="Create Book" onclick="CreateBook(this)" style="display: none" /></dd>
+
+            <dd><div id="result"></div></dd>
+
+        </dl>
+    </div>
+</div>
+
+
+@helper ManagerList()
+{
+
+    <select id="managerlist" name="managerlist" size="1">
+        <option disabled>Choose manager</option>
+        @if (Model != null)
+        {
+            foreach (var manager in Model.Managers)
+            {
+                <option value="@manager.Id">@manager.FirstName @manager.LastName</option>
+            }
+        }
+        else
+        {
+            <p>Model == null</p>
+        }
+    </select>
+}
