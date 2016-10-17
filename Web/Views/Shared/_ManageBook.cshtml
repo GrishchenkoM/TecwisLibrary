@@ -42,14 +42,14 @@
         }
 
         $.ajax({
-            url: '/api/content',
+            url: '/api/content/PostBook',
             type: 'POST',
             data: viewModel,
             success: function(model) {
                 window.UpdateIndexContent(model, '#modBookDialog');
             },
             error: function(data) {
-                $('#result').text(data.responseText);
+                $('#bookResult').append(data.responseText);
             }
         });
     }
@@ -68,14 +68,14 @@
         }
 
         $.ajax({
-            url: '/api/content',
+            url: '/api/content/PutBook',
             type: 'PUT',
             data: viewModel,
             success: function(model) {
                 window.UpdateIndexContent(model, '#modBookDialog');
             },
             error: function(data) {
-                $('#result').text(data.responseText);
+                $('#bookResult').append(data.responseText);
             }
         });
     }
@@ -86,13 +86,13 @@
         readContent();
 
         $.ajax({
-            url: '/api/content/' + content.bookId,
+            url: '/api/book/' + content.bookId,
             type: 'DELETE',
             success: function(model) {
                 window.UpdateIndexContent(model, '#modBookDialog');
             },
             error: function(data) {
-                $('#result').text(data.responseText);
+                $('#bookResult').append(data.responseText);
             }
         });
     }
@@ -104,6 +104,7 @@
         var authorNameInput = $('#authorNameInput').val().replace(new RegExp('\n', 'g'), '').replace(new RegExp(' ', 'g'), '');
         if (book !== '' && year !== '' && authorNameInput !== '') {
             for (var i = 0; i < currentBtns.length; ++i) {
+                $('#bookResult').text('');
                 $(currentBtns[i]).css("display", "block");
             }
         } else {
@@ -138,7 +139,7 @@
                 }
             },
             error: function(data) {
-                $('#result').text(data.responseText);
+                $('#bookResult').append(data.responseText);
             }
         });
     }
@@ -158,11 +159,11 @@
                 $('#bookYear').val(data.ContentModels[0].Year);
                 $('#authorNameInput').val(data.ContentModels[0].AuthorName);
                 $('#authorNameSelect').val(data.ContentModels[0].AuthorName);
-                currentBtns = ["#updateBtn", "#deleteBtn"];
+                currentBtns = ["#updateBookBtn", "#deleteBookBtn"];
                 displayButton();
             },
             error: function(data) {
-                $('#result').text(data.responseText);
+                $('#bookResult').append(data.responseText);
             }
         });
     }
@@ -191,9 +192,9 @@
 
     // подписка кнопок
     function btnEvents() {
-        $("#createBtn").bind("click", CreateBook);
-        $("#updateBtn").bind("click", UpdateBook);
-        $("#deleteBtn").bind("click", DeleteBook);
+        $("#createBookBtn").bind("click", CreateBook);
+        $("#updateBookBtn").bind("click", UpdateBook);
+        $("#deleteBookBtn").bind("click", DeleteBook);
     }
 
     // отображение контента
@@ -203,7 +204,8 @@
             getBook(model);
         } else {
             getAuthors();
-            currentBtns = ["#createBtn"];
+            currentBtns = ["#createBookBtn"];
+            $('#bookResult').append("Create button will be enabled when all fields will be filled");
         }
     }
     
@@ -246,15 +248,15 @@
             <dd><input type="text" id="bookId" style="display: none"/></dd>
             <dd><br /></dd>
 
-            <dd><input type="submit" id="createBtn" value="Create Book" style="display: none" /></dd>
+            <dd><input type="submit" id="createBookBtn" value="Create Book" style="display: none" /></dd>
             <dd>
-                <input type="submit" id="updateBtn" value="Update Book" style="display: none"/>
+                <input type="submit" id="updateBookBtn" value="Update Book" style="display: none"/>
                 &nbsp;
-                <input type="submit" id="deleteBtn" value="Delete Book" style="display: none" />
+                <input type="submit" id="deleteBookBtn" value="Delete Book" style="display: none" />
             </dd>
 
 
-            <dd><fieldset><br/><div id="result"></div></fieldset></dd>
+            <dd><fieldset><br/><div id="bookResult"></div></fieldset></dd>
 
         </dl>
     </div>

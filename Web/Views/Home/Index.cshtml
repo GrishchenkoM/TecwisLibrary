@@ -1,15 +1,5 @@
 ﻿@{
     ViewBag.Title = "Home Page";
-    //var ajaxBooks = new AjaxOptions
-    //{
-    //    UpdateTargetId = "Books",
-    //    Url = Url.Action("GetBooks")
-    //};
-    //var ajaxAuthors = new AjaxOptions
-    //{
-    //    UpdateTargetId = "Authors",
-    //    Url = Url.Action("GetAuthors")
-    //};
     var ajaxSearch = new AjaxOptions()
     {
         HttpMethod = "GET",
@@ -74,9 +64,9 @@
 
         <div class="col-md-2">
             @*Create Author Button*@
-            <input type="submit" id="createAuthor" value="New Author" onclick="NewAuthorView()" />
+            <input type="submit" id="createAuthor" value="New Author" onclick="NewAuthorView()"/>
         </div>
-
+        
         <div class="col-md-10">
 
             @*Table*@
@@ -113,28 +103,34 @@
 
 
 <script>
+
+
+
     function Update() {
         function displayBooks(data) {
+
             var div = $("#Books");
             div.empty();
 
             var tbl = document.createElement('table');
-            //tbl.style.width = '100%';
-            //tbl.setAttribute('border', '1');
             tbl.setAttribute('class', 'table color_table');
             tbl.setAttribute('id', 'bookTab');
 
-
             var thead = document.createElement('thead');
-
             var tr = document.createElement('tr');
 
             var th = document.createElement('th');
+            th.appendChild(document.createTextNode('ID'));
+            tr.appendChild(th);
+
+            th = document.createElement('th');
             th.appendChild(document.createTextNode('Name'));
             tr.appendChild(th);
+
             th = document.createElement('th');
             th.appendChild(document.createTextNode('Year'));
             tr.appendChild(th);
+
             th = document.createElement('th');
             th.appendChild(document.createTextNode('Author'));
             tr.appendChild(th);
@@ -143,14 +139,18 @@
 
             tbl.appendChild(thead);
 
-            console.log(data.ContentModels.length);
             var tbdy = document.createElement('tbody');
 
             for (var i = 0; i < data.ContentModels.length; ++i) {
+
                 tr = document.createElement('tr');
                 tr.setAttribute('id', data.ContentModels[i].BookId);
 
                 var td = document.createElement('td');
+                td.appendChild(document.createTextNode(data.ContentModels[i].BookId));
+                tr.appendChild(td);
+
+                td = document.createElement('td');
                 td.appendChild(document.createTextNode(data.ContentModels[i].BookName));
                 tr.appendChild(td);
 
@@ -167,6 +167,24 @@
 
             tbl.appendChild(tbdy);
             $("#Books").append(tbl);
+
+            $('table[id="bookTab"] tr').click(function () {
+                if ($('td:first-child', this).html() != undefined)
+                    UpdateBookView($('td:first-child', this).html());
+            });
+            $('table[id="bookTab"] tbody tr').click(function () {
+                $('table[id="bookTab"] tbody tr').removeClass();
+                $(this).addClass('selected');
+            });
+            $('table[id="bookTab"] tbody tr').mouseover(function () {
+                $('table[id="bookTab"] tbody tr').removeClass();
+                $(this).addClass('selected');
+            });
+            $('table[id="bookTab"] tbody tr').mouseleave(function () {
+                $('table[id="bookTab"] tbody tr').removeClass();
+            });
+            $('table[id="bookTab"] th:first-child').css("display", "none");
+            $('table[id="bookTab"] td:first-child').css("display", "none");
         }
 
         function displayAuthors(data) {
@@ -174,18 +192,23 @@
             div.empty();
 
             var tbl = document.createElement('table');
-            //tbl.style.width = '100%';
-            //tbl.setAttribute('border', '1');
             tbl.setAttribute('class', 'table color_table');
             tbl.setAttribute('id', 'authorTab');
 
 
             var thead = document.createElement('thead');
-
             var tr = document.createElement('tr');
 
             var th = document.createElement('th');
+            th.appendChild(document.createTextNode('ID'));
+            tr.appendChild(th);
+
+            th = document.createElement('th');
             th.appendChild(document.createTextNode('Name'));
+            tr.appendChild(th);
+
+            th = document.createElement('th');
+            th.appendChild(document.createTextNode('Books Count'));
             tr.appendChild(th);
 
             thead.appendChild(tr);
@@ -195,11 +218,20 @@
             var tbdy = document.createElement('tbody');
 
             for (var i = 0; i < data.ContentModels.length; ++i) {
+
                 tr = document.createElement('tr');
                 tr.setAttribute('id', data.ContentModels[i].AuthorId);
 
                 var td = document.createElement('td');
+                td.appendChild(document.createTextNode(data.ContentModels[i].AuthorId));
+                tr.appendChild(td);
+
+                td = document.createElement('td');
                 td.appendChild(document.createTextNode(data.ContentModels[i].AuthorName));
+                tr.appendChild(td);
+
+                td = document.createElement('td');
+                td.appendChild(document.createTextNode(data.ContentModels[i].Count));
                 tr.appendChild(td);
 
                 tbdy.appendChild(tr);
@@ -207,6 +239,24 @@
 
             tbl.appendChild(tbdy);
             $("#Authors").append(tbl);
+
+            $('table[id="authorTab"] tr').click(function () {
+                if ($('td:first-child', this).html() != undefined)
+                    UpdateAuthorView($('td:first-child', this).html());
+            });
+            $('table[id="authorTab"] tbody tr').click(function () {
+                $('table[id="authorTab"] tbody tr').removeClass();
+                $(this).addClass('selected');
+            });
+            $('table[id="authorTab"] tbody tr').mouseover(function () {
+                $('table[id="authorTab"] tbody tr').removeClass();
+                $(this).addClass('selected');
+            });
+            $('table[id="authorTab"] tbody tr').mouseleave(function () {
+                $('table[id="authorTab"] tbody tr').removeClass();
+            });
+            $('table[id="authorTab"] th:first-child').css("display", "none");
+            $('table[id="authorTab"] td:first-child').css("display", "none");
         }
 
         $.ajax({
@@ -215,6 +265,13 @@
             dataType: 'json',
             success: function (data) {
                 displayBooks(data);
+            },
+            error: function(data) {
+                var div = $("#Books");
+                div.empty();
+                var substring = 'Database is empty';
+                if (data.responseText.search(substring) != -1)
+                    div.append(substring);
             }
         });
 
@@ -224,12 +281,30 @@
             dataType: 'json',
             success: function (data) {
                 displayAuthors(data);
+            },
+            error: function(data) {
+                var div = $("#Authors");
+                div.empty();
+                var substring = 'Database is empty';
+                if (data.responseText.search(substring) != -1)
+                    div.append(substring);
             }
         });
     }
 
-    $(Document).ready(function() {
+    $(document).ready(function () {
         Update();
+
+        //$('table[id="authorTab"] tr').click(function () {
+        //    console.log("working");
+        //    console.log($(this.cells[0]).text());
+        //    //OpenUpdateRequestView($(this.cells[0]).text());
+        //});
+
+        //$('table[id="authorTab"] tr').click(function () {
+        //    $('table[id="authorTab"] tr').removeClass();
+        //    $(this).addClass('selected');
+        //});
     });
 
 
@@ -239,6 +314,19 @@
                 url: '@Url.Action("NewBookView", "Home")',
                 type: 'POST',
                 success: function (data) {
+                    $('#dialogBookContent').html(data);
+                    $('#modBookDialog').modal('show');
+                }
+            });
+        });
+    }
+    function UpdateBookView(id) {
+        $(function() {
+            $.ajax({
+                url: '@Url.Action("NewBookView", "Home")',
+                type: 'POST',
+                data: {index: id},
+                success: function(data) {
                     $('#dialogBookContent').html(data);
                     $('#modBookDialog').modal('show');
                 }
@@ -259,8 +347,21 @@
         });
     }
 
+    function UpdateAuthorView(id) {
+        $(function () {
+            $.ajax({
+                url: '@Url.Action("NewAuthorView", "Home")',
+                type: 'POST',
+                data: { index: id },
+                success: function (data) {
+                    $('#dialogAuthorContent').html(data);
+                    $('#modAuthorDialog').modal('show');
+                }
+            });
+        });
+    }
+
     function UpdateIndexContent(model, modDialogId) {
-        console.log("in UpdateIndexContent func");
 
         if (modDialogId != null) {
             $(modDialogId).modal('hide');
@@ -277,8 +378,7 @@
 
     function UpdateContent(page) {
         $(function () {
-            console.log("in UpdateContent");
-
+            
             //var pageNumber = page;
             //var viewModel = {
             //    page: pageNumber

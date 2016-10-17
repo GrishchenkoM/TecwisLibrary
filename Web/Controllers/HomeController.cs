@@ -18,5 +18,13 @@ namespace Web.Controllers
 
             return View("_ManageBook", -1);
         }
+
+        public ActionResult NewAuthorView(int? index)
+        {
+            if (index != null)
+                return View("_ManageAuthor", index);
+
+            return View("_ManageAuthor", -1);
+        }
     }
 }

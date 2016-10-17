@@ -132,5 +132,8 @@ namespace Web.Models
 
         [Display(Name = "Year")]
         public int Year { get; set; }
+
+        [Display(Name = "Books count")]
+        public int Count { get; set; }
     }
 }
