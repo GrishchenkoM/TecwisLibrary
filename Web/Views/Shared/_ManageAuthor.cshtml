@@ -1,6 +1,36 @@
 ﻿@model dynamic
 @{ Layout = null;}
 
+<div class="modal-content">
+    <div class="modal-header">
+        <button class="close" data-dismiss="modal" area-hidden="true">X</button>
+        <h4>Manage Author</h4>
+    </div>
+    <div class="modal-body">
+        <dl class="dl-horizontal" id="content">
+
+            <dt>Author Name</dt>
+            <dd><fieldset><input type="text" id="authorName" name="sql" pattern="^[a-zA-ZА-Яа-яЁё\s]+$" required /></fieldset></dd>
+
+            <dd><br /></dd>
+
+            <dd><input type="text" id="authorId" style="display: none" /></dd>
+            <dd><br /></dd>
+
+            <dd><input type="submit" id="createAuthorBtn" value="Create Author" style="display: none" /></dd>
+            <dd>
+                <input type="submit" id="updateAuthorBtn" value="Update Author" style="display: none" />
+                &nbsp;
+                <input type="submit" id="deleteAuthorBtn" value="Delete Author" style="display: none" />
+            </dd>
+
+
+            <dd><fieldset><br /><textarea id="authorResult" style="width: 300px; display: none" disabled="disabled" ></textarea></fieldset></dd>
+
+        </dl>
+    </div>
+</div>
+
 <script>
     var currentBtns = []; // отображение определенных кнопок текущего модального окна
 
@@ -13,7 +43,7 @@
         else authorId = -1;
 
         content.authorId = authorId;
-        content.authorName = $('#authorName').val().replace(new RegExp('\n', 'g'), '').replace(new RegExp(' ', 'g'), '');;
+        content.authorName = $('#authorName').val().replace(new RegExp('\n', 'g'), '')@*.replace(new RegExp(' ', 'g'), '')*@;
     }
 
     // создание автора - POST
@@ -34,6 +64,7 @@
                 window.UpdateIndexContent(model, '#modAuthorDialog');
             },
             error: function(data) {
+                $('#authorResult').css("display", "block");
                 $('#authorResult').append(data.responseText);
             }
         });
@@ -57,6 +88,7 @@
                 window.UpdateIndexContent(model, '#modAuthorDialog');
             },
             error: function(data) {
+                $('#authorResult').css("display", "block");
                 $('#authorResult').append(data.responseText);
             }
         });
@@ -74,6 +106,7 @@
                 window.UpdateIndexContent(model, '#modAuthorDialog');
             },
             error: function(data) {
+                $('#authorResult').css("display", "block");
                 $('#authorResult').append(data.responseText);
             }
         });
@@ -84,12 +117,13 @@
         var author = $('#authorName').val().replace(new RegExp('\n', 'g'), '').replace(new RegExp(' ', 'g'), '');
         if (author !== '') {
             for (var i = 0; i < currentBtns.length; ++i) {
-                $('#authorResult').text('');
+                //$('#authorResult').css("display", "none");
                 $(currentBtns[i]).css("display", "block");
             }
         } else {
             for (var i = 0; i < currentBtns.length; ++i) {
                 $(currentBtns[i]).css("display", "none");
+                $('#authorResult').css("display", "block");
             }
         }
     }
@@ -106,6 +140,7 @@
                 $('#authorName').val(data.ContentModels[0].AuthorName);
                 if(data.ContentModels[0].Count > 0){
                     currentBtns = ["#updateAuthorBtn"];
+                    $('#authorResult').css("display", "block");
                     $('#authorResult').append("Delete button will be enabled when Book's Count will be zero");
                 } else {
                     currentBtns = ["#updateAuthorBtn", "#deleteAuthorBtn"];
@@ -113,6 +148,7 @@
                 displayButton();
             },
             error: function(data) {
+                $('#authorResult').css("display", "block");
                 $('#authorResult').append(data.responseText);
             }
         });
@@ -146,7 +182,8 @@
             getAuthor(model);
         } else {
             currentBtns = ["#createAuthorBtn"];
-            $('#authorResult').append("Start writing...");
+            //$('#authorResult').css("display", "block");
+            //$('#authorResult').append("Start writing...");
         }
     }
     
@@ -163,33 +200,5 @@
 </script>
 
 
-<div class="modal-content">
-    <div class="modal-header">
-        <button class="close" data-dismiss="modal" area-hidden="true">X</button>
-        <h4>Manage Author</h4>
-    </div>
-    <div class="modal-body">
-        <dl class="dl-horizontal" id="content">
 
-            <dt>Author Name</dt>
-            <dd><fieldset><input type="text" id="authorName" name="sql" required/></fieldset></dd>
-
-            <dd><br/></dd>
-
-            <dd><input type="text" id="authorId" style="display: none"/></dd>
-            <dd><br /></dd>
-
-            <dd><input type="submit" id="createAuthorBtn" value="Create Author" style="display: none" /></dd>
-            <dd>
-                <input type="submit" id="updateAuthorBtn" value="Update Author" style="display: none"/>
-                &nbsp;
-                <input type="submit" id="deleteAuthorBtn" value="Delete Author" style="display: none" />
-            </dd>
-
-
-            <dd><fieldset><br/><div id="authorResult"></div></fieldset></dd>
-
-        </dl>
-    </div>
-</div>
 

@@ -23,7 +23,7 @@ namespace Web.Controllers
 
                 var books = DataManager.Books.Get();
                 var authors = DataManager.Authors.Get();
-                list = new ArrayList() {books, authors};
+                list = new ArrayList {books, authors};
                 
                 var model = ModelFactory.Create(list);
                 if (model.ContentModels != null && model.ContentModels.Count > 0)
@@ -46,7 +46,7 @@ namespace Web.Controllers
                 {
                     var book = DataManager.Books.Get((int)index);
                     var author = DataManager.Authors.Get(book.AuthorId);
-                    list = new ArrayList() { book, author };
+                    list = new ArrayList { book, author };
                 }
 
                 var model = ModelFactory.Create(list);
@@ -90,7 +90,7 @@ namespace Web.Controllers
                     }
                     foreach (var q in queue)
                     {
-                        model.ContentModels.Add(new ContentModel()
+                        model.ContentModels.Add(new ContentModel
                         {
                             AuthorId = q.Key.Id,
                             AuthorName = q.Key.Name,
@@ -113,7 +113,7 @@ namespace Web.Controllers
                 var wb = withoutBooks.Where(x => x.BookId == -1);
                 foreach (var a in wb)
                 {
-                    model.ContentModels.Add(new ContentModel()
+                    model.ContentModels.Add(new ContentModel
                     {
                         AuthorId = a.AuthorId,
                         AuthorName = a.AuthorName,
@@ -162,7 +162,7 @@ namespace Web.Controllers
                         }
                         foreach (var q in queue)
                         {
-                            model.ContentModels.Add(new ContentModel()
+                            model.ContentModels.Add(new ContentModel
                             {
                                 AuthorId = q.Key.Id,
                                 AuthorName = q.Key.Name,
@@ -185,7 +185,7 @@ namespace Web.Controllers
                     var wb = withoutBooks.Where(x => x.BookId == -1);
                     foreach (var a in wb)
                     {
-                        model.ContentModels.Add(new ContentModel()
+                        model.ContentModels.Add(new ContentModel
                         {
                             AuthorId = a.AuthorId,
                             AuthorName = a.AuthorName,
@@ -220,7 +220,7 @@ namespace Web.Controllers
 
             try
             {
-                var list = ModelFactory.Create(new ViewModel() {ContentModel = model});
+                var list = ModelFactory.Create(new ViewModel {ContentModel = model});
 
                 foreach (var unit in list)
                 {
@@ -240,7 +240,7 @@ namespace Web.Controllers
                         book.AuthorId = author.Id;
                         book = DataManager.Books.Create(book);
                     
-                        var entityModel = ModelFactory.Create(new ArrayList() {book, author});
+                        var entityModel = ModelFactory.Create(new ArrayList {book, author});
                         return Created($"/api/book/{book.Id}", entityModel);
                     }
                 }
@@ -263,7 +263,7 @@ namespace Web.Controllers
 
             try
             {
-                var list = ModelFactory.Create(new ViewModel() { ContentModel = model });
+                var list = ModelFactory.Create(new ViewModel { ContentModel = model });
 
                 foreach (var unit in list)
                 {
@@ -275,13 +275,13 @@ namespace Web.Controllers
                     if (author.Id == -1)
                     {
                         author = DataManager.Authors.Create(author);
-                        var entityModel = ModelFactory.Create(new ArrayList() { author });
+                        var entityModel = ModelFactory.Create(new ArrayList { author });
                         return Created($"/api/author/{author.Id}", entityModel);
                     }
                     else
                     {
                         author = DataManager.Authors.Get().Where(x => x.Name.Equals(author.Name)).ToList()[0];
-                        var entityModel = ModelFactory.Create(new ArrayList() { author });
+                        var entityModel = ModelFactory.Create(new ArrayList { author });
                         return Ok(entityModel);
                     }
                 }
@@ -305,7 +305,7 @@ namespace Web.Controllers
 
             try
             {
-                var list = ModelFactory.Create(new ViewModel() { ContentModel = model });
+                var list = ModelFactory.Create(new ViewModel { ContentModel = model });
 
                 foreach (var unit in list)
                 {
@@ -317,18 +317,18 @@ namespace Web.Controllers
 
                 if (authorModel != null)
                 {
-                    var author = DataManager.Authors.Get().Where(x => x.Name.Equals(authorModel.Name)).ToList();
-                    if (!author.Any())
+                    var author = DataManager.Authors.Get().FirstOrDefault(x => x.Name.Equals(authorModel.Name));
+                    if (author == null)
                     {
                         authorModel = DataManager.Authors.Create(authorModel);
                     }
 
                     if (bookModel != null)
                     {
-                        bookModel.AuthorId = authorModel.Id;
+                        bookModel.AuthorId = author.Id;
                         var book = DataManager.Books.Update(bookModel);
 
-                        var entityModel = ModelFactory.Create(new ArrayList() { book, authorModel });
+                        var entityModel = ModelFactory.Create(new ArrayList { book, authorModel });
                         return Ok(entityModel);
                     }
                 }
@@ -351,7 +351,7 @@ namespace Web.Controllers
 
             try
             {
-                var list = ModelFactory.Create(new ViewModel() { ContentModel = model });
+                var list = ModelFactory.Create(new ViewModel { ContentModel = model });
 
                 foreach (var unit in list)
                 {
@@ -363,7 +363,7 @@ namespace Web.Controllers
                 {
                     author = DataManager.Authors.Update(author);
                     
-                    var entityModel = ModelFactory.Create(new ArrayList() {author});
+                    var entityModel = ModelFactory.Create(new ArrayList {author});
                     return Ok(entityModel);
                 }
 
@@ -411,6 +411,45 @@ namespace Web.Controllers
             {
                 return InternalServerError(ex);
             }
+        }
+
+        [Route("api/content/QuickSearch")]
+        [HttpGet]
+        public IHttpActionResult QuickSearch(string term)
+        {
+            var books = DataManager.Books.Get();
+            var authors = DataManager.Authors.Get();
+
+            var items = (from b in books
+                join a in authors on b.AuthorId equals a.Id
+                where a.Name.ToLower().Contains(term.ToLower()) 
+                || b.Name.ToLower().Contains(term.ToLower())
+                select new ContentModel
+                {
+                    BookId = b.Id,
+                    BookName = b.Name,
+                    Year = b.Year,
+                    AuthorId = a.Id,
+                    AuthorName = a.Name
+                }).ToList();
+
+            var items1 = books.Join(authors.Where(a => a.Name.Contains(term)),
+                b => b.AuthorId,
+                a => a.Id,
+                (b, a) => new { label = a.Name }).ToList();
+
+            var model = new ViewModel(items);
+
+            //ArrayList list;
+            //list = new ArrayList { books, authors };
+            //var model = ModelFactory.Create(list);
+
+
+            //if (model.ContentModels != null && model.ContentModels.Count > 0)
+            //return Json(items1, JsonRequestBehavior.AllowGet);
+            return Ok(model);
+
+            //return InternalServerError(new Exception("Database is empty."));
         }
     }
 }

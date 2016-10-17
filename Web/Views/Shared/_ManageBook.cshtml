@@ -1,12 +1,52 @@
 ﻿@model dynamic
 @{ Layout = null;}
 
+
+<div class="modal-content">
+    <div class="modal-header">
+        <button class="close" data-dismiss="modal" area-hidden="true">X</button>
+        <h4>Manage Book</h4>
+    </div>
+    <div class="modal-body">
+        <dl class="dl-horizontal" id="content">
+
+            <dt>Name of Book</dt>
+            <dd><fieldset><input type="text" id="bookName" name="sql" required/></fieldset></dd>
+
+            <dd><br /></dd>
+
+            <dt>Year</dt>
+            <dd><input type="text" id="bookYear" pattern="[0-9]{4}" maxlength="4"required/></dd>
+
+            <dd><br/></dd>
+
+            <dt>Author</dt>
+            <dd><input type="text" id="authorNameInput" pattern="^[a-zA-ZА-Яа-яЁё\s]+$" required/></dd>
+            <dd><select id="authorNameSelect"></select></dd>
+
+            <dd><input type="text" id="bookId" style="display: none"/></dd>
+            <dd><br /></dd>
+
+            <dd><input type="submit" id="createBookBtn" value="Create Book" style="display: none" /></dd>
+            <dd>
+                <input type="submit" id="updateBookBtn" value="Update Book" style="display: none"/>
+                &nbsp;
+                <input type="submit" id="deleteBookBtn" value="Delete Book" style="display: none" />
+            </dd>
+
+
+            <dd><fieldset><br/><textarea id="bookResult" style="width: 300px; display: none" disabled="disabled"></textarea></fieldset></dd>
+
+        </dl>
+    </div>
+</div>
+
 <script>
     var currentBtns = []; // отображение определенных кнопок текущего модального окна
 
     var content = {}; // хранение контента окна
 
-    // считывание контента 
+    // считывание контента
     function readContent() {
         var bookId = $('#bookId').val();
         if (bookId != '') bookId = parseInt($('#bookId').val());
@@ -16,7 +56,7 @@
         content.bookName = $('#bookName').val();
 
         var authorNameSelect = $('#authorNameSelect').val();
-        var authorNameInput = $('#authorNameInput').val().replace(new RegExp('\n', 'g'), '').replace(new RegExp(' ', 'g'), '');
+        var authorNameInput = $('#authorNameInput').val().replace(new RegExp('\n', 'g'), '')@*.replace(new RegExp(' ', 'g'), '')*@;
         var authorId = -1; //new author
         var authorName = authorNameInput;
         if (authorNameInput == authorNameSelect) {
@@ -30,9 +70,9 @@
 
     // создание книги - POST
     function CreateBook() {
-        
+
         readContent();
-        
+
         var viewModel = {
             BookId: content.bookId,
             BookName: content.bookName,
@@ -49,6 +89,7 @@
                 window.UpdateIndexContent(model, '#modBookDialog');
             },
             error: function(data) {
+                $('#bookResult').css("display", "block");
                 $('#bookResult').append(data.responseText);
             }
         });
@@ -75,6 +116,7 @@
                 window.UpdateIndexContent(model, '#modBookDialog');
             },
             error: function(data) {
+                $('#bookResult').css("display", "block");
                 $('#bookResult').append(data.responseText);
             }
         });
@@ -82,7 +124,7 @@
 
     // удаление книги - DELETE
     function DeleteBook() {
-        
+
         readContent();
 
         $.ajax({
@@ -92,6 +134,7 @@
                 window.UpdateIndexContent(model, '#modBookDialog');
             },
             error: function(data) {
+                $('#bookResult').css("display", "block");
                 $('#bookResult').append(data.responseText);
             }
         });
@@ -105,6 +148,7 @@
         if (book !== '' && year !== '' && authorNameInput !== '') {
             for (var i = 0; i < currentBtns.length; ++i) {
                 $('#bookResult').text('');
+                $('#bookResult').css("display", "none");
                 $(currentBtns[i]).css("display", "block");
             }
         } else {
@@ -139,6 +183,7 @@
                 }
             },
             error: function(data) {
+                $('#bookResult').css("display", "block");
                 $('#bookResult').append(data.responseText);
             }
         });
@@ -163,6 +208,7 @@
                 displayButton();
             },
             error: function(data) {
+                $('#bookResult').css("display", "block");
                 $('#bookResult').append(data.responseText);
             }
         });
@@ -205,10 +251,11 @@
         } else {
             getAuthors();
             currentBtns = ["#createBookBtn"];
+            $('#bookResult').css("display", "block");
             $('#bookResult').append("Create button will be enabled when all fields will be filled");
         }
     }
-    
+
     $(document).ready(function() {
 
         keyUpDisplBtnForModalViewContent();
@@ -221,44 +268,3 @@
     });
 
 </script>
-
-
-<div class="modal-content">
-    <div class="modal-header">
-        <button class="close" data-dismiss="modal" area-hidden="true">X</button>
-        <h4>Manage Book</h4>
-    </div>
-    <div class="modal-body">
-        <dl class="dl-horizontal" id="content">
-
-            <dt>Name of Book</dt>
-            <dd><fieldset><input type="text" id="bookName" name="sql" required/></fieldset></dd>
-
-            <dd><br /></dd>
-
-            <dt>Year</dt>
-            <dd><input type="number" id="bookYear" required/></dd>
-
-            <dd><br/></dd>
-
-            <dt>Author</dt>
-            <dd><input type="text" id="authorNameInput" required/></dd>
-            <dd><select id="authorNameSelect"></select></dd>
-
-            <dd><input type="text" id="bookId" style="display: none"/></dd>
-            <dd><br /></dd>
-
-            <dd><input type="submit" id="createBookBtn" value="Create Book" style="display: none" /></dd>
-            <dd>
-                <input type="submit" id="updateBookBtn" value="Update Book" style="display: none"/>
-                &nbsp;
-                <input type="submit" id="deleteBookBtn" value="Delete Book" style="display: none" />
-            </dd>
-
-
-            <dd><fieldset><br/><div id="bookResult"></div></fieldset></dd>
-
-        </dl>
-    </div>
-</div>
-

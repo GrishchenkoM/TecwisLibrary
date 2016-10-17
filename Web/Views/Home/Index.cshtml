@@ -1,4 +1,5 @@
-﻿@{
+﻿@using System.Web.UI.WebControls
+@{
     ViewBag.Title = "Home Page";
     var ajaxSearch = new AjaxOptions()
     {
@@ -7,7 +8,6 @@
         UpdateTargetId = ""
     };
 }
-<script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 
 <br /><br />
 <div class="row">
@@ -20,7 +20,7 @@
 
         <div class="col-md-1">
             @*Create Book Button*@
-            <input type="submit" id="createBook" value="New Book" onclick="NewBookView()" />
+            <input type="submit" id="createBook" value="New Book" onclick="NewBookView()"/>
         </div>
 
         <div class="col-md-8">
@@ -28,17 +28,17 @@
             @*Table*@
             <div id="myTabContent1" class="tab-content">
 
-                
-                    <div id="Books">
-                        @*@Html.Action("GetBooks")*@
-                    </div>
-                
+
+                <div id="Books">
+                    @*@Html.Action("GetBooks")*@
+                </div>
+
 
                 @* create modal view *@
                 <div id="modBookDialog" class="modal fade">
                     <div id="dialogBookContent" class="modal-dialog"></div>
                 </div>
-                
+
             </div>
 
         </div>
@@ -46,14 +46,10 @@
         <div class="col-md-3">
             @*TestBox for searching*@
             <div>
-                @using (Ajax.BeginForm("Search", "Home", ajaxSearch))
-                {
-                    <span>
-                        <input type="text" name="search" data-autocomplete="true" />
-                        &nbsp;
-                        <input type="submit" value="Search" />
+                <span><label>Search:</label>
+                    <input type="text" name="search" id="search" data-autocomplete="true" />
                     </span>
-                }
+                
             </div>
         </div>
 
@@ -100,165 +96,162 @@
     </ul>
 }
 
-
-
+<script src="~/Scripts/jquery-1.10.2.js"></script>
 <script>
+    function displayBooks(data) {
 
+        var div = $("#Books");
+        div.empty();
 
+        var tbl = document.createElement('table');
+        tbl.setAttribute('class', 'table color_table');
+        tbl.setAttribute('id', 'bookTab');
 
-    function Update() {
-        function displayBooks(data) {
+        var thead = document.createElement('thead');
+        var tr = document.createElement('tr');
 
-            var div = $("#Books");
-            div.empty();
+        var th = document.createElement('th');
+        th.appendChild(document.createTextNode('ID'));
+        tr.appendChild(th);
 
-            var tbl = document.createElement('table');
-            tbl.setAttribute('class', 'table color_table');
-            tbl.setAttribute('id', 'bookTab');
+        th = document.createElement('th');
+        th.appendChild(document.createTextNode('Name'));
+        tr.appendChild(th);
 
-            var thead = document.createElement('thead');
-            var tr = document.createElement('tr');
+        th = document.createElement('th');
+        th.appendChild(document.createTextNode('Year'));
+        tr.appendChild(th);
 
-            var th = document.createElement('th');
-            th.appendChild(document.createTextNode('ID'));
-            tr.appendChild(th);
+        th = document.createElement('th');
+        th.appendChild(document.createTextNode('Author'));
+        tr.appendChild(th);
 
-            th = document.createElement('th');
-            th.appendChild(document.createTextNode('Name'));
-            tr.appendChild(th);
+        thead.appendChild(tr);
 
-            th = document.createElement('th');
-            th.appendChild(document.createTextNode('Year'));
-            tr.appendChild(th);
+        tbl.appendChild(thead);
 
-            th = document.createElement('th');
-            th.appendChild(document.createTextNode('Author'));
-            tr.appendChild(th);
+        var tbdy = document.createElement('tbody');
 
-            thead.appendChild(tr);
+        for (var i = 0; i < data.ContentModels.length; ++i) {
 
-            tbl.appendChild(thead);
+            tr = document.createElement('tr');
+            tr.setAttribute('id', data.ContentModels[i].BookId);
 
-            var tbdy = document.createElement('tbody');
+            var td = document.createElement('td');
+            td.appendChild(document.createTextNode(data.ContentModels[i].BookId));
+            tr.appendChild(td);
 
-            for (var i = 0; i < data.ContentModels.length; ++i) {
+            td = document.createElement('td');
+            td.appendChild(document.createTextNode(data.ContentModels[i].BookName));
+            tr.appendChild(td);
 
-                tr = document.createElement('tr');
-                tr.setAttribute('id', data.ContentModels[i].BookId);
+            td = document.createElement('td');
+            td.appendChild(document.createTextNode(data.ContentModels[i].Year));
+            tr.appendChild(td);
 
-                var td = document.createElement('td');
-                td.appendChild(document.createTextNode(data.ContentModels[i].BookId));
-                tr.appendChild(td);
+            td = document.createElement('td');
+            td.appendChild(document.createTextNode(data.ContentModels[i].AuthorName));
+            tr.appendChild(td);
 
-                td = document.createElement('td');
-                td.appendChild(document.createTextNode(data.ContentModels[i].BookName));
-                tr.appendChild(td);
-
-                td = document.createElement('td');
-                td.appendChild(document.createTextNode(data.ContentModels[i].Year));
-                tr.appendChild(td);
-
-                td = document.createElement('td');
-                td.appendChild(document.createTextNode(data.ContentModels[i].AuthorName));
-                tr.appendChild(td);
-
-                tbdy.appendChild(tr);
-            }
-
-            tbl.appendChild(tbdy);
-            $("#Books").append(tbl);
-
-            $('table[id="bookTab"] tr').click(function () {
-                if ($('td:first-child', this).html() != undefined)
-                    UpdateBookView($('td:first-child', this).html());
-            });
-            $('table[id="bookTab"] tbody tr').click(function () {
-                $('table[id="bookTab"] tbody tr').removeClass();
-                $(this).addClass('selected');
-            });
-            $('table[id="bookTab"] tbody tr').mouseover(function () {
-                $('table[id="bookTab"] tbody tr').removeClass();
-                $(this).addClass('selected');
-            });
-            $('table[id="bookTab"] tbody tr').mouseleave(function () {
-                $('table[id="bookTab"] tbody tr').removeClass();
-            });
-            $('table[id="bookTab"] th:first-child').css("display", "none");
-            $('table[id="bookTab"] td:first-child').css("display", "none");
+            tbdy.appendChild(tr);
         }
 
-        function displayAuthors(data) {
-            var div = $("#Authors");
-            div.empty();
+        tbl.appendChild(tbdy);
+        $("#Books").append(tbl);
 
-            var tbl = document.createElement('table');
-            tbl.setAttribute('class', 'table color_table');
-            tbl.setAttribute('id', 'authorTab');
+        $('table[id="bookTab"] tr').click(function () {
+            if ($('td:first-child', this).html() != undefined)
+                UpdateBookView($('td:first-child', this).html());
+        });
+        $('table[id="bookTab"] tbody tr').click(function () {
+            $('table[id="bookTab"] tbody tr').removeClass();
+            $(this).addClass('selected');
+        });
+        $('table[id="bookTab"] tbody tr').mouseover(function () {
+            $('table[id="bookTab"] tbody tr').removeClass();
+            $(this).addClass('selected');
+        });
+        $('table[id="bookTab"] tbody tr').mouseleave(function () {
+            $('table[id="bookTab"] tbody tr').removeClass();
+        });
+        $('table[id="bookTab"] th:first-child').css("display", "none");
+        $('table[id="bookTab"] td:first-child').css("display", "none");
+    }
+    function displayAuthors(data) {
+        var div = $("#Authors");
+        div.empty();
+
+        var tbl = document.createElement('table');
+        tbl.setAttribute('class', 'table color_table');
+        tbl.setAttribute('id', 'authorTab');
 
 
-            var thead = document.createElement('thead');
-            var tr = document.createElement('tr');
+        var thead = document.createElement('thead');
+        var tr = document.createElement('tr');
 
-            var th = document.createElement('th');
-            th.appendChild(document.createTextNode('ID'));
-            tr.appendChild(th);
+        var th = document.createElement('th');
+        th.appendChild(document.createTextNode('ID'));
+        tr.appendChild(th);
 
-            th = document.createElement('th');
-            th.appendChild(document.createTextNode('Name'));
-            tr.appendChild(th);
+        th = document.createElement('th');
+        th.appendChild(document.createTextNode('Name'));
+        tr.appendChild(th);
 
-            th = document.createElement('th');
-            th.appendChild(document.createTextNode('Books Count'));
-            tr.appendChild(th);
+        th = document.createElement('th');
+        th.appendChild(document.createTextNode('Books Count'));
+        tr.appendChild(th);
 
-            thead.appendChild(tr);
+        thead.appendChild(tr);
 
-            tbl.appendChild(thead);
+        tbl.appendChild(thead);
 
-            var tbdy = document.createElement('tbody');
+        var tbdy = document.createElement('tbody');
 
-            for (var i = 0; i < data.ContentModels.length; ++i) {
+        for (var i = 0; i < data.ContentModels.length; ++i) {
 
-                tr = document.createElement('tr');
-                tr.setAttribute('id', data.ContentModels[i].AuthorId);
+            tr = document.createElement('tr');
+            tr.setAttribute('id', data.ContentModels[i].AuthorId);
 
-                var td = document.createElement('td');
-                td.appendChild(document.createTextNode(data.ContentModels[i].AuthorId));
-                tr.appendChild(td);
+            var td = document.createElement('td');
+            td.appendChild(document.createTextNode(data.ContentModels[i].AuthorId));
+            tr.appendChild(td);
 
-                td = document.createElement('td');
-                td.appendChild(document.createTextNode(data.ContentModels[i].AuthorName));
-                tr.appendChild(td);
+            td = document.createElement('td');
+            td.appendChild(document.createTextNode(data.ContentModels[i].AuthorName));
+            tr.appendChild(td);
 
-                td = document.createElement('td');
-                td.appendChild(document.createTextNode(data.ContentModels[i].Count));
-                tr.appendChild(td);
+            td = document.createElement('td');
+            td.appendChild(document.createTextNode(data.ContentModels[i].Count));
+            tr.appendChild(td);
 
-                tbdy.appendChild(tr);
-            }
-
-            tbl.appendChild(tbdy);
-            $("#Authors").append(tbl);
-
-            $('table[id="authorTab"] tr').click(function () {
-                if ($('td:first-child', this).html() != undefined)
-                    UpdateAuthorView($('td:first-child', this).html());
-            });
-            $('table[id="authorTab"] tbody tr').click(function () {
-                $('table[id="authorTab"] tbody tr').removeClass();
-                $(this).addClass('selected');
-            });
-            $('table[id="authorTab"] tbody tr').mouseover(function () {
-                $('table[id="authorTab"] tbody tr').removeClass();
-                $(this).addClass('selected');
-            });
-            $('table[id="authorTab"] tbody tr').mouseleave(function () {
-                $('table[id="authorTab"] tbody tr').removeClass();
-            });
-            $('table[id="authorTab"] th:first-child').css("display", "none");
-            $('table[id="authorTab"] td:first-child').css("display", "none");
+            tbdy.appendChild(tr);
         }
 
+        tbl.appendChild(tbdy);
+        $("#Authors").append(tbl);
+
+        $('table[id="authorTab"] tr').click(function () {
+            if ($('td:first-child', this).html() != undefined)
+                UpdateAuthorView($('td:first-child', this).html());
+        });
+        $('table[id="authorTab"] tbody tr').click(function () {
+            $('table[id="authorTab"] tbody tr').removeClass();
+            $(this).addClass('selected');
+        });
+        $('table[id="authorTab"] tbody tr').mouseover(function () {
+            $('table[id="authorTab"] tbody tr').removeClass();
+            $(this).addClass('selected');
+        });
+        $('table[id="authorTab"] tbody tr').mouseleave(function () {
+            $('table[id="authorTab"] tbody tr').removeClass();
+        });
+        $('table[id="authorTab"] th:first-child').css("display", "none");
+        $('table[id="authorTab"] td:first-child').css("display", "none");
+    }
+
+    function Update(id) {
+        
+        if (id == null) {
         $.ajax({
             url: '/api/content/GetBooks',
             type: 'GET',
@@ -274,6 +267,24 @@
                     div.append(substring);
             }
         });
+        } else {
+            $.ajax({
+                url: '/api/content/GetBooks',
+                type: 'GET',
+                dataType: 'json',
+                data: { index: id },
+                success: function (data) {
+                    displayBooks(data);
+                },
+                error: function (data) {
+                    var div = $("#Books");
+                    div.empty();
+                    var substring = 'Database is empty';
+                    if (data.responseText.search(substring) != -1)
+                        div.append(substring);
+                }
+            });
+        }
 
         $.ajax({
             url: '/api/content/GetAuthors',
@@ -293,18 +304,44 @@
     }
 
     $(document).ready(function () {
+        
+        $('#search').autocomplete({
+            source: function (request, response) {
+                $(this).attr("data-autocomplete");
+                $.ajax({
+                    url: '/api/content/quicksearch',
+                    type: 'GET',
+                    data: request,
+                    success: function (data) {
+                        displayBooks(data);
+                        response($.map(data.ContentModels, function (name, val) {
+                            return {
+                                label: name.BookName,
+                                value: name.BookId
+                            }
+                        }));
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        //alert('error - ' + textStatus);
+                        console.log('error', textStatus, errorThrown);
+                    }
+                });
+            },
+            minLength: 1,
+            select: function (event, ui) {
+                //alert('you have selected ' + ui.item.label + ' ID: ' + ui.item.value);
+                $('#search').val(ui.item.label);
+                Update(parseInt(ui.item.value));
+                return false;
+            }
+        });
+
+        $('#search').keyup(function () {
+            if ($('#search').val() === '')
+                Update();
+        });
+
         Update();
-
-        //$('table[id="authorTab"] tr').click(function () {
-        //    console.log("working");
-        //    console.log($(this.cells[0]).text());
-        //    //OpenUpdateRequestView($(this.cells[0]).text());
-        //});
-
-        //$('table[id="authorTab"] tr').click(function () {
-        //    $('table[id="authorTab"] tr').removeClass();
-        //    $(this).addClass('selected');
-        //});
     });
 
 
@@ -376,65 +413,9 @@
         }
     }
 
-    function UpdateContent(page) {
+    function UpdateContent() {
         $(function () {
-            
-            //var pageNumber = page;
-            //var viewModel = {
-            //    page: pageNumber
-            //}
-
             Update();
         });
     }
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@*<div class="jumbotron">
-            <h1>ASP.NET</h1>
-            <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
-            <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <h2>Getting started</h2>
-                <p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
-                a broad range of clients, including browsers and mobile devices. ASP.NET Web API
-                is an ideal platform for building RESTful applications on the .NET Framework.</p>
-                <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
-            </div>
-            <div class="col-md-4">
-                <h2>Get more libraries</h2>
-                <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-                <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
-            </div>
-            <div class="col-md-4">
-                <h2>Web Hosting</h2>
-                <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-                <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
-            </div>
-        </div>*@
