@@ -9,24 +9,21 @@
 
     <br/>
 
+    @*Book Nav Tab*@
     <div class="tab-pane fade active in" id="bookTable">
 
         <div class="col-md-1">
             @*Create Book Button*@
-            <input type="submit" id="createBook" value="New Book" onclick="NewBookView()"/>
+            <input type="submit" id="createBook" value="New Book"/>
         </div>
 
         <div class="col-md-8">
 
             @*Table*@
             <div id="myTabContent1" class="tab-content">
-
-
-                <div id="Books">
-                    @*@Html.Action("GetBooks")*@
-                </div>
-
-
+                
+                <div id="Books"></div>
+                
                 @* create modal view *@
                 <div id="modBookDialog" class="modal fade">
                     <div id="dialogBookContent" class="modal-dialog"></div>
@@ -47,12 +44,12 @@
 
     </div>
 
-
+    @*Author Nav Tab*@
     <div class="tab-pane fade" id="authorTable">
 
         <div class="col-md-2">
             @*Create Author Button*@
-            <input type="submit" id="createAuthor" value="New Author" onclick="NewAuthorView()"/>
+            <input type="submit" id="createAuthor" value="New Author"/>
         </div>
 
         <div class="col-md-10">
@@ -71,7 +68,6 @@
 
         </div>
 
-
     </div>
 </div>
 
@@ -83,6 +79,7 @@
         <li class=""><a href="#authorTable" data-toggle="tab">Authors</a></li>
     </ul>
 }
+
 <script src="~/Scripts/jquery-1.10.2.js"></script>
 <script src="~/Scripts/indexScripts.js"></script>
 <script>
@@ -106,14 +103,12 @@
                         }));
                     },
                     error: function (xmlHttpRequest, textStatus, errorThrown) {
-                        //alert('error - ' + textStatus);
                         console.log("error", textStatus, errorThrown);
                     }
                 });
             },
             minLength: 1,
             select: function (event, ui) {
-                //alert('you have selected ' + ui.item.label + ' ID: ' + ui.item.value);
                 $("#search").val(ui.item.label);
                 Update(parseInt(ui.item.value));
                 return false;
@@ -127,6 +122,10 @@
         });
 
         Update();
+        btnEvents();
+
+        $('#createBook').css("margin-bottom", "20px");
+        $('#createAuthor').css("margin-bottom", "20px");
     });
 
     function NewBookView() {

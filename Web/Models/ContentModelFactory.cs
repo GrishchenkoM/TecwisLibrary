@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Web;
-using System.Web.Mvc.Html;
 using Core.Entities;
-using Web.Models.EntityModels;
 using Web.Models.EntityModels.Interfaces;
 
 namespace Web.Models
@@ -22,29 +18,23 @@ namespace Web.Models
             Author author = null;
             Book book = null;
 
-            foreach (var u in unit)
+            foreach (dynamic u in unit)
             {
                 if (u is List<Author>)
-                {
-                    authors = u as List<Author>; continue;
-                }
-                if (u is List<Book>)
-                {
-                    books = u as List<Book>; continue;
-                }
-                if (u is Author)
-                {
-                    author = u as Author; continue;
-                }
-                if (u is Book)
+                    authors = u as List<Author>;
+                else if (u is List<Book>)
+                    books = u as List<Book>;
+                else if (u is Author)
+                    author = u as Author;
+                else if (u is Book)
                     book = u as Book;
             }
-            if(authors != null || books != null)
-                if (authors != null)
+
+            if (authors != null)
+            {
+                if (books != null)
                 {
-                    if (books != null)
-                    {
-                        list = (from b in books
+                    list = (from b in books
                             join a in authors on b.AuthorId equals a.Id
                             select new ContentModel
                             {
@@ -54,15 +44,16 @@ namespace Web.Models
                                 AuthorId = a.Id,
                                 AuthorName = a.Name
                             }).ToList();
-                    }
-                    else
-                    {
-                        list = authors.Select(a => new ContentModel()
-                        {
-                            AuthorId = a.Id, AuthorName = a.Name
-                        }).ToList();
-                    }
                 }
+                if (books == null)
+                {
+                    list = authors.Select(a => new ContentModel()
+                    {
+                        AuthorId = a.Id,
+                        AuthorName = a.Name
+                    }).ToList();
+                }
+            }
 
             if (author != null && book != null)
             {

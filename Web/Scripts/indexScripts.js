@@ -227,3 +227,9 @@ function UpdateIndexContent(model, modDialogId) {
     }
 }
 
+// subscription buttons to events
+function btnEvents() {
+    $("#createBook").bind("click", NewBookView);
+    $("#createAuthor").bind("click", NewAuthorView);
+}
+
