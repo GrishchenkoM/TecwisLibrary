@@ -221,6 +221,7 @@
     <Compile Include="Models\EntityModels\Interfaces\IModelFactory.cs" />
     <Compile Include="Models\PagingHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SourceData.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />

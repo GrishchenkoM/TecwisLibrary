@@ -17,12 +17,18 @@ namespace Web
             {
                 books = _dataManager.Books.Get();
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
             try
             {
                 authors = _dataManager.Authors.Get();
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
 
             if ((authors == null && books == null) ||
                 (authors.Count == 0 && books.Count == 0))

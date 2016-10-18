@@ -25,7 +25,10 @@ namespace Web.Models
                     result.Append(tag);
                 }
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
 
             return result.ToString();
         }

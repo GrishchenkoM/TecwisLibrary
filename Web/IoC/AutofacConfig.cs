@@ -14,15 +14,12 @@ namespace Web.IoC
     {
         public static void ConfigureContainer()
         {
-            // получаем экземпляр контейнера
             var builder = new ContainerBuilder();
 
-            // регистрируем контроллер в текущей сборке
             builder.RegisterControllers(typeof(WebApiApplication).Assembly);
             builder.RegisterControllers(Assembly.GetExecutingAssembly());
             builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
 
-            // регистрируем споставление типов
             builder.RegisterType<DbDataContext>().As<DbDataContext>().WithParameter("DefaultConnection",
                                                    ConfigurationManager.ConnectionStrings[1].ConnectionString);
 
@@ -32,10 +29,8 @@ namespace Web.IoC
 
             builder.RegisterType<DataManager>().As<IDataManager>();
 
-            // создаем новый контейнер с теми зависимостями, которые определены выше
             var container = builder.Build();
 
-            // установка сопоставителя зависимостей
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
 
             var apiResolver = new AutofacWebApiDependencyResolver(container);

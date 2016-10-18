@@ -1,6 +1,4 @@
-﻿using Core.Entities;
-
-namespace Web.Models.EntityModels.Interfaces
+﻿namespace Web.Models.EntityModels.Interfaces
 {
     public interface IModelFactory<TEntity, TModel> : IModelFactory where TModel : IModel
     {
