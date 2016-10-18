@@ -13,7 +13,8 @@ namespace Web.Controllers
     {
         public ContentController(IDataManager dataManager) : base(dataManager)
         {
-            _pageSize = 5; 
+            _pageSize = 5;
+            SourceData.GetInstance((DataManager)dataManager); // fill DB with source info
         }
 
         [Route("api/content/GetBooks")]
@@ -320,6 +321,8 @@ namespace Web.Controllers
         private ViewModel GetAuthorsViewModel(int pageSize, int? page = null)
         {
             var model = GetAuthorsViewModel();
+
+            model.ContentModels.Sort((x,y) => y.Count - x.Count);
 
             var pageInfo = new PageInfo
             {
