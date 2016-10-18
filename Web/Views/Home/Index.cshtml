@@ -1,12 +1,5 @@
-﻿@using System.Web.UI.WebControls
-@{
+﻿@{
     ViewBag.Title = "Home Page";
-    var ajaxSearch = new AjaxOptions()
-    {
-        HttpMethod = "GET",
-        InsertionMode = InsertionMode.Replace,
-        UpdateTargetId = ""
-    };
 }
 
 <br /><br />
@@ -14,7 +7,7 @@
 
     @CreateNavTabs()
 
-    <br />
+    <br/>
 
     <div class="tab-pane fade active in" id="bookTable">
 
@@ -49,7 +42,6 @@
                 <span><label>Search:</label>
                     <input type="text" name="search" id="search" data-autocomplete="true" />
                     </span>
-                
             </div>
         </div>
 
@@ -62,23 +54,19 @@
             @*Create Author Button*@
             <input type="submit" id="createAuthor" value="New Author" onclick="NewAuthorView()"/>
         </div>
-        
+
         <div class="col-md-10">
 
             @*Table*@
             <div id="myTabContent" class="tab-content">
 
-                
-                    <div id="Authors">
-                        @*@Html.Action("GetAuthors")*@
-                    </div>
-                
+                <div id="Authors"></div>
 
                 @* create modal view *@
                 <div id="modAuthorDialog" class="modal fade">
                     <div id="dialogAuthorContent" class="modal-dialog"></div>
                 </div>
-                
+
             </div>
 
         </div>
@@ -95,327 +83,100 @@
         <li class=""><a href="#authorTable" data-toggle="tab">Authors</a></li>
     </ul>
 }
-
 <script src="~/Scripts/jquery-1.10.2.js"></script>
+<script src="~/Scripts/indexScripts.js"></script>
 <script>
-    function displayBooks(data) {
-
-        var div = $("#Books");
-        div.empty();
-
-        var tbl = document.createElement('table');
-        tbl.setAttribute('class', 'table color_table');
-        tbl.setAttribute('id', 'bookTab');
-
-        var thead = document.createElement('thead');
-        var tr = document.createElement('tr');
-
-        var th = document.createElement('th');
-        th.appendChild(document.createTextNode('ID'));
-        tr.appendChild(th);
-
-        th = document.createElement('th');
-        th.appendChild(document.createTextNode('Name'));
-        tr.appendChild(th);
-
-        th = document.createElement('th');
-        th.appendChild(document.createTextNode('Year'));
-        tr.appendChild(th);
-
-        th = document.createElement('th');
-        th.appendChild(document.createTextNode('Author'));
-        tr.appendChild(th);
-
-        thead.appendChild(tr);
-
-        tbl.appendChild(thead);
-
-        var tbdy = document.createElement('tbody');
-
-        for (var i = 0; i < data.ContentModels.length; ++i) {
-
-            tr = document.createElement('tr');
-            tr.setAttribute('id', data.ContentModels[i].BookId);
-
-            var td = document.createElement('td');
-            td.appendChild(document.createTextNode(data.ContentModels[i].BookId));
-            tr.appendChild(td);
-
-            td = document.createElement('td');
-            td.appendChild(document.createTextNode(data.ContentModels[i].BookName));
-            tr.appendChild(td);
-
-            td = document.createElement('td');
-            td.appendChild(document.createTextNode(data.ContentModels[i].Year));
-            tr.appendChild(td);
-
-            td = document.createElement('td');
-            td.appendChild(document.createTextNode(data.ContentModels[i].AuthorName));
-            tr.appendChild(td);
-
-            tbdy.appendChild(tr);
-        }
-
-        tbl.appendChild(tbdy);
-        $("#Books").append(tbl);
-
-        $('table[id="bookTab"] tr').click(function () {
-            if ($('td:first-child', this).html() != undefined)
-                UpdateBookView($('td:first-child', this).html());
-        });
-        $('table[id="bookTab"] tbody tr').click(function () {
-            $('table[id="bookTab"] tbody tr').removeClass();
-            $(this).addClass('selected');
-        });
-        $('table[id="bookTab"] tbody tr').mouseover(function () {
-            $('table[id="bookTab"] tbody tr').removeClass();
-            $(this).addClass('selected');
-        });
-        $('table[id="bookTab"] tbody tr').mouseleave(function () {
-            $('table[id="bookTab"] tbody tr').removeClass();
-        });
-        $('table[id="bookTab"] th:first-child').css("display", "none");
-        $('table[id="bookTab"] td:first-child').css("display", "none");
-    }
-    function displayAuthors(data) {
-        var div = $("#Authors");
-        div.empty();
-
-        var tbl = document.createElement('table');
-        tbl.setAttribute('class', 'table color_table');
-        tbl.setAttribute('id', 'authorTab');
-
-
-        var thead = document.createElement('thead');
-        var tr = document.createElement('tr');
-
-        var th = document.createElement('th');
-        th.appendChild(document.createTextNode('ID'));
-        tr.appendChild(th);
-
-        th = document.createElement('th');
-        th.appendChild(document.createTextNode('Name'));
-        tr.appendChild(th);
-
-        th = document.createElement('th');
-        th.appendChild(document.createTextNode('Books Count'));
-        tr.appendChild(th);
-
-        thead.appendChild(tr);
-
-        tbl.appendChild(thead);
-
-        var tbdy = document.createElement('tbody');
-
-        for (var i = 0; i < data.ContentModels.length; ++i) {
-
-            tr = document.createElement('tr');
-            tr.setAttribute('id', data.ContentModels[i].AuthorId);
-
-            var td = document.createElement('td');
-            td.appendChild(document.createTextNode(data.ContentModels[i].AuthorId));
-            tr.appendChild(td);
-
-            td = document.createElement('td');
-            td.appendChild(document.createTextNode(data.ContentModels[i].AuthorName));
-            tr.appendChild(td);
-
-            td = document.createElement('td');
-            td.appendChild(document.createTextNode(data.ContentModels[i].Count));
-            tr.appendChild(td);
-
-            tbdy.appendChild(tr);
-        }
-
-        tbl.appendChild(tbdy);
-        $("#Authors").append(tbl);
-
-        $('table[id="authorTab"] tr').click(function () {
-            if ($('td:first-child', this).html() != undefined)
-                UpdateAuthorView($('td:first-child', this).html());
-        });
-        $('table[id="authorTab"] tbody tr').click(function () {
-            $('table[id="authorTab"] tbody tr').removeClass();
-            $(this).addClass('selected');
-        });
-        $('table[id="authorTab"] tbody tr').mouseover(function () {
-            $('table[id="authorTab"] tbody tr').removeClass();
-            $(this).addClass('selected');
-        });
-        $('table[id="authorTab"] tbody tr').mouseleave(function () {
-            $('table[id="authorTab"] tbody tr').removeClass();
-        });
-        $('table[id="authorTab"] th:first-child').css("display", "none");
-        $('table[id="authorTab"] td:first-child').css("display", "none");
-    }
-
-    function Update(id) {
-        
-        if (id == null) {
-        $.ajax({
-            url: '/api/content/GetBooks',
-            type: 'GET',
-            dataType: 'json',
-            success: function (data) {
-                displayBooks(data);
-            },
-            error: function(data) {
-                var div = $("#Books");
-                div.empty();
-                var substring = 'Database is empty';
-                if (data.responseText.search(substring) != -1)
-                    div.append(substring);
-            }
-        });
-        } else {
-            $.ajax({
-                url: '/api/content/GetBooks',
-                type: 'GET',
-                dataType: 'json',
-                data: { index: id },
-                success: function (data) {
-                    displayBooks(data);
-                },
-                error: function (data) {
-                    var div = $("#Books");
-                    div.empty();
-                    var substring = 'Database is empty';
-                    if (data.responseText.search(substring) != -1)
-                        div.append(substring);
-                }
-            });
-        }
-
-        $.ajax({
-            url: '/api/content/GetAuthors',
-            type: 'GET',
-            dataType: 'json',
-            success: function (data) {
-                displayAuthors(data);
-            },
-            error: function(data) {
-                var div = $("#Authors");
-                div.empty();
-                var substring = 'Database is empty';
-                if (data.responseText.search(substring) != -1)
-                    div.append(substring);
-            }
-        });
-    }
-
     $(document).ready(function () {
-        
-        $('#search').autocomplete({
+
+        //Search filter + autocomplete
+        $("#search").autocomplete({
             source: function (request, response) {
                 $(this).attr("data-autocomplete");
                 $.ajax({
-                    url: '/api/content/quicksearch',
-                    type: 'GET',
+                    url: "/api/content/quicksearch",
+                    type: "GET",
                     data: request,
                     success: function (data) {
                         displayBooks(data);
-                        response($.map(data.ContentModels, function (name, val) {
+                        response($.map(data.ContentModels, function (name) {
                             return {
                                 label: name.BookName,
                                 value: name.BookId
                             }
                         }));
                     },
-                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    error: function (xmlHttpRequest, textStatus, errorThrown) {
                         //alert('error - ' + textStatus);
-                        console.log('error', textStatus, errorThrown);
+                        console.log("error", textStatus, errorThrown);
                     }
                 });
             },
             minLength: 1,
             select: function (event, ui) {
                 //alert('you have selected ' + ui.item.label + ' ID: ' + ui.item.value);
-                $('#search').val(ui.item.label);
+                $("#search").val(ui.item.label);
                 Update(parseInt(ui.item.value));
                 return false;
             }
         });
 
-        $('#search').keyup(function () {
-            if ($('#search').val() === '')
+        //Handle Search filter for content updating
+        $("#search").keyup(function () {
+            if ($("#search").val() === "")
                 Update();
         });
 
         Update();
     });
 
-
     function NewBookView() {
         $(function () {
             $.ajax({
                 url: '@Url.Action("NewBookView", "Home")',
-                type: 'POST',
+                type: "POST",
                 success: function (data) {
-                    $('#dialogBookContent').html(data);
-                    $('#modBookDialog').modal('show');
+                    $("#dialogBookContent").html(data);
+                    $("#modBookDialog").modal("show");
                 }
             });
         });
     }
     function UpdateBookView(id) {
-        $(function() {
+        $(function () {
             $.ajax({
                 url: '@Url.Action("NewBookView", "Home")',
-                type: 'POST',
-                data: {index: id},
-                success: function(data) {
-                    $('#dialogBookContent').html(data);
-                    $('#modBookDialog').modal('show');
+                type: "POST",
+                data: { index: id },
+                success: function (data) {
+                    $("#dialogBookContent").html(data);
+                    $("#modBookDialog").modal("show");
                 }
             });
         });
     }
-
     function NewAuthorView() {
         $(function () {
             $.ajax({
                 url: '@Url.Action("NewAuthorView", "Home")',
-                type: 'POST',
+                type: "POST",
                 success: function (data) {
-                    $('#dialogAuthorContent').html(data);
-                    $('#modAuthorDialog').modal('show');
+                    $("#dialogAuthorContent").html(data);
+                    $("#modAuthorDialog").modal("show");
                 }
             });
         });
     }
-
     function UpdateAuthorView(id) {
         $(function () {
             $.ajax({
                 url: '@Url.Action("NewAuthorView", "Home")',
-                type: 'POST',
+                type: "POST",
                 data: { index: id },
                 success: function (data) {
-                    $('#dialogAuthorContent').html(data);
-                    $('#modAuthorDialog').modal('show');
+                    $("#dialogAuthorContent").html(data);
+                    $("#modAuthorDialog").modal("show");
                 }
             });
-        });
-    }
-
-    function UpdateIndexContent(model, modDialogId) {
-
-        if (modDialogId != null) {
-            $(modDialogId).modal('hide');
-        } else {
-            $('#modDialog').modal('hide');
-        }
-
-        try {
-            UpdateContent();
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-    function UpdateContent() {
-        $(function () {
-            Update();
         });
     }
 </script>
