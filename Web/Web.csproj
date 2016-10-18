@@ -219,6 +219,7 @@
     <Compile Include="Models\EntityModels\AuthorModelFactory.cs" />
     <Compile Include="Models\EntityModels\BookModelFactory.cs" />
     <Compile Include="Models\EntityModels\Interfaces\IModelFactory.cs" />
+    <Compile Include="Models\PagingHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

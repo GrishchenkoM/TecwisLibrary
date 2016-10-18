@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Core.Entities;
+using Web.Controllers;
 using Web.Models.EntityModels.Interfaces;
 
 namespace Web.Models
@@ -17,6 +19,8 @@ namespace Web.Models
             List<Book> books = null;
             Author author = null;
             Book book = null;
+            var page = (int)State.Empty;
+            var pageSize = (int)State.Empty;
 
             foreach (dynamic u in unit)
             {
@@ -28,6 +32,13 @@ namespace Web.Models
                     author = u as Author;
                 else if (u is Book)
                     book = u as Book;
+                else if (u is int)
+                {
+                    if (pageSize == (int)State.Empty)
+                        pageSize = (int)u;
+                    else if (page == (int)State.Empty)
+                        page = (int) u;
+                }
             }
 
             if (authors != null)
@@ -69,8 +80,27 @@ namespace Web.Models
 
                 list.Add(model);
             }
+            
+            ViewModel viewModel = null;
+            if (list != null)
+            {
+                var pageInfo = new PageInfo
+                {
+                    PageNumber = 1,
+                    PageSize = pageSize,
+                    TotalItems = list.Count
+                };
 
-            return new ViewModel(list);
+                if (page != (int)State.Empty)
+                    viewModel = new ViewModel(list.Skip((page - 1)*pageSize).Take(pageSize).ToList());
+                else if (pageSize != (int)State.Empty)
+                    viewModel = new ViewModel(list.Take(pageSize).ToList());
+                else
+                    viewModel = new ViewModel(list);
+
+                viewModel.PageInfo = pageInfo;
+            }
+            return viewModel;
         }
 
         public ArrayList Create(ViewModel model)
@@ -105,8 +135,9 @@ namespace Web.Models
         {
             ContentModels = list;
         }
-        public List<ContentModel> ContentModels;
-        public ContentModel ContentModel;
+        public List<ContentModel> ContentModels { get; set; }
+        public ContentModel ContentModel { get; set; }
+        public PageInfo PageInfo { get; set; }
     }
 
     public class ContentModel : IModel
@@ -126,5 +157,13 @@ namespace Web.Models
 
         [Display(Name = "Books count")]
         public int Count { get; set; }
+    }
+
+    public class PageInfo
+    {
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+        public int TotalItems { get; set; }
+        public int TotalPages => (int)Math.Ceiling((decimal)TotalItems / PageSize);
     }
 }

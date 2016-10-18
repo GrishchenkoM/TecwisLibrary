@@ -1,4 +1,5 @@
-﻿@{
+﻿@using Web.Models
+@{
     ViewBag.Title = "Home Page";
 }
 
@@ -18,12 +19,17 @@
         </div>
 
         <div class="col-md-8">
+            
+            @*Page Links*@
+            <div class="btn-group">
+                <div id="bookPageLinks"></div>
+            </div>
 
             @*Table*@
             <div id="myTabContent1" class="tab-content">
-                
+
                 <div id="Books"></div>
-                
+
                 @* create modal view *@
                 <div id="modBookDialog" class="modal fade">
                     <div id="dialogBookContent" class="modal-dialog"></div>
@@ -53,6 +59,11 @@
         </div>
 
         <div class="col-md-10">
+
+            @*Page Links*@
+            <div class="btn-group">
+                <div id="authorPageLinks"></div>
+            </div>
 
             @*Table*@
             <div id="myTabContent" class="tab-content">
@@ -123,59 +134,9 @@
 
         Update();
         btnEvents();
+        pageLinksStyle();
 
         $('#createBook').css("margin-bottom", "20px");
         $('#createAuthor').css("margin-bottom", "20px");
     });
-
-    function NewBookView() {
-        $(function () {
-            $.ajax({
-                url: '@Url.Action("NewBookView", "Home")',
-                type: "POST",
-                success: function (data) {
-                    $("#dialogBookContent").html(data);
-                    $("#modBookDialog").modal("show");
-                }
-            });
-        });
-    }
-    function UpdateBookView(id) {
-        $(function () {
-            $.ajax({
-                url: '@Url.Action("NewBookView", "Home")',
-                type: "POST",
-                data: { index: id },
-                success: function (data) {
-                    $("#dialogBookContent").html(data);
-                    $("#modBookDialog").modal("show");
-                }
-            });
-        });
-    }
-    function NewAuthorView() {
-        $(function () {
-            $.ajax({
-                url: '@Url.Action("NewAuthorView", "Home")',
-                type: "POST",
-                success: function (data) {
-                    $("#dialogAuthorContent").html(data);
-                    $("#modAuthorDialog").modal("show");
-                }
-            });
-        });
-    }
-    function UpdateAuthorView(id) {
-        $(function () {
-            $.ajax({
-                url: '@Url.Action("NewAuthorView", "Home")',
-                type: "POST",
-                data: { index: id },
-                success: function (data) {
-                    $("#dialogAuthorContent").html(data);
-                    $("#modAuthorDialog").modal("show");
-                }
-            });
-        });
-    }
 </script>

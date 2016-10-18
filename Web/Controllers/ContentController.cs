@@ -12,7 +12,9 @@ namespace Web.Controllers
     public class ContentController : BaseApiController<ContentModelFactory>
     {
         public ContentController(IDataManager dataManager) : base(dataManager)
-        { }
+        {
+            _pageSize = 5; 
+        }
 
         [Route("api/content/GetBooks")]
         public IHttpActionResult GetBooks()
@@ -22,7 +24,8 @@ namespace Web.Controllers
                 var books = DataManager.Books.Get();
                 var authors = DataManager.Authors.Get();
 
-                var model = ModelFactory.Create(new ArrayList { books, authors });
+                var model = ModelFactory.Create(new ArrayList { books, authors, _pageSize });
+                
                 if (model.ContentModels != null && model.ContentModels.Count > 0)
                     return Ok(model);
 
@@ -34,20 +37,40 @@ namespace Web.Controllers
             }
         }
         [Route("api/content/GetBooks")]
-        public IHttpActionResult GetBooks(int? index)
+        public IHttpActionResult GetBooks(int index)
         {
             try
             {
-                ArrayList list = null;
-                if (index != null)
-                {
-                    var book = DataManager.Books.Get((int)index);
-                    var author = DataManager.Authors.Get(book.AuthorId);
-                    list = new ArrayList { book, author };
-                }
-
+                var book = DataManager.Books.Get(index);
+                var author = DataManager.Authors.Get(book.AuthorId);
+                var list = new ArrayList {book, author};
+                
                 var model = ModelFactory.Create(list);
 
+                if (model.ContentModels != null && model.ContentModels.Count > 0)
+                    return Ok(model);
+
+                return InternalServerError(new Exception("Database is empty."));
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+        [Route("api/content/GetBooksByPage")]
+        public IHttpActionResult GetBooksByPage(int? page)
+        {
+            try
+            {
+                var books = DataManager.Books.Get();
+                var authors = DataManager.Authors.Get();
+
+                var list = new ArrayList {books, authors, _pageSize};
+                if (page != null)
+                    list.Add(page);
+                
+                var model = ModelFactory.Create(list);
+                
                 if (model.ContentModels != null && model.ContentModels.Count > 0)
                     return Ok(model);
 
@@ -64,8 +87,7 @@ namespace Web.Controllers
         {
             try
             {
-                var model = GetAuthorsViewModel();
-
+                var model = GetAuthorsViewModel(_pageSize);
 
                 if (model.ContentModels != null && model.ContentModels.Count > 0)
                     return Ok(model);
@@ -92,6 +114,22 @@ namespace Web.Controllers
                     if (newModel.ContentModels != null && newModel.ContentModels.Count > 0)
                         return Ok(newModel);
                 }
+
+                return InternalServerError(new Exception("Database is empty."));
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+        public IHttpActionResult GetAuthorsByPage(int? page)
+        {
+            try
+            {
+                var model = GetAuthorsViewModel(_pageSize, page);
+
+                if (model.ContentModels != null && model.ContentModels.Count > 0)
+                    return Ok(model);
 
                 return InternalServerError(new Exception("Database is empty."));
             }
@@ -279,6 +317,25 @@ namespace Web.Controllers
 
             return model;
         }
+        private ViewModel GetAuthorsViewModel(int pageSize, int? page = null)
+        {
+            var model = GetAuthorsViewModel();
+
+            var pageInfo = new PageInfo
+            {
+                PageNumber = 1,
+                PageSize = pageSize,
+                TotalItems = model.ContentModels.Count
+            };
+
+            model.ContentModels = page != null 
+                ? model.ContentModels.Skip(((int)page - 1) * pageSize).Take(pageSize).ToList() 
+                : model.ContentModels.Take(pageSize).ToList();
+
+            model.PageInfo = pageInfo;
+
+            return model;
+        }
         private static void AuthorsWithoutBooks(ViewModel model, List<Author> authors, List<Book> books)
         {
             var withoutBooks = from a in authors
@@ -357,6 +414,6 @@ namespace Web.Controllers
             }
         }
 
-        protected enum State { Empty = -1 }
+        private readonly int _pageSize;
     }
 }

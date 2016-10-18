@@ -1,7 +1,11 @@
-﻿using System.Web.Mvc;
+﻿using System.Web;
+using System.Web.Mvc;
+using Web.Models;
 
 namespace Web.Controllers
 {
+    public enum State { Empty = -1 }
+
     public class HomeController : Controller
     {
         public ActionResult Index()
@@ -25,6 +29,19 @@ namespace Web.Controllers
                 return View("_ManageAuthor", index);
 
             return View("_ManageAuthor", -1);
+        }
+
+        public string PageLinksForBookTab(int totalPages, int pageNumber)
+        {
+            var result = PagingHelpers.PageLinksHtml(totalPages, pageNumber, "UpdateBooksContentWithPage");
+            
+            return new HtmlString(result).ToHtmlString();
+        }
+        public string PageLinksForAuthorTab(int totalPages, int pageNumber)
+        {
+            var result = PagingHelpers.PageLinksHtml(totalPages, pageNumber, "UpdateAuthorsContentWithPage");
+
+            return new HtmlString(result).ToHtmlString();
         }
     }
 }

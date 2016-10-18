@@ -163,6 +163,11 @@ function Update(id) {
                 dataType: "json",
                 success: function (data) {
                     displayBooks(data);
+                    var div = $("#bookPageLinks");
+                    div.empty();
+                    if (data.PageInfo.TotalItems > data.PageInfo.PageSize)
+                        CreateBookPageLinks(data.PageInfo);
+                    pageLinksStyle();
                 },
                 error: function(data) {
                     var div = $("#Books");
@@ -189,7 +194,7 @@ function Update(id) {
                         div.append(substring);
                 }
             });
-    }
+        } 
 
         //GetAuthors
         $.ajax({
@@ -198,6 +203,11 @@ function Update(id) {
             dataType: "json",
             success: function (data) {
                 displayAuthors(data);
+                var div = $("#authorPageLinks");
+                div.empty();
+                if (data.PageInfo.TotalItems > data.PageInfo.PageSize)
+                    CreateAuthorPageLinks(data.PageInfo);
+                pageLinksStyle();
             },
             error: function(data) {
                 var div = $("#Authors");
@@ -227,9 +237,175 @@ function UpdateIndexContent(model, modDialogId) {
     }
 }
 
+function NewBookView() {
+    $(function () {
+        $.ajax({
+            url: '/home/NewBookView',
+            type: "POST",
+            success: function (data) {
+                $("#dialogBookContent").html(data);
+                $("#modBookDialog").modal("show");
+            }
+        });
+    });
+}
+function UpdateBookView(id) {
+    $(function () {
+        $.ajax({
+            url: '/home/NewBookView',
+            type: "POST",
+            data: { index: id },
+            success: function (data) {
+                $("#dialogBookContent").html(data);
+                $("#modBookDialog").modal("show");
+            }
+        });
+    });
+}
+function NewAuthorView() {
+    $(function () {
+        $.ajax({
+            url: '/home/NewAuthorView',
+            type: "POST",
+            success: function (data) {
+                $("#dialogAuthorContent").html(data);
+                $("#modAuthorDialog").modal("show");
+            }
+        });
+    });
+}
+function UpdateAuthorView(id) {
+    $(function () {
+        $.ajax({
+            url: '/home/NewAuthorView',
+            type: "POST",
+            data: { index: id },
+            success: function (data) {
+                $("#dialogAuthorContent").html(data);
+                $("#modAuthorDialog").modal("show");
+            }
+        });
+    });
+}
+
 // subscription buttons to events
 function btnEvents() {
     $("#createBook").bind("click", NewBookView);
     $("#createAuthor").bind("click", NewAuthorView);
 }
 
+function CreateBookPageLinks(data) {
+    var viewModel = { totalPages: data.TotalPages, pageNumber: data.PageNumber }
+
+    $.ajax({
+        url: "/home/PageLinksForBookTab",
+        type: "GET",
+        data: viewModel,
+        success: function(data) {
+            $("#bookPageLinks").html(data);
+            pageLinksStyle();
+        },
+        error: function(data) {
+            console.log(data);
+        }
+    });
+}
+function CreateAuthorPageLinks(data) {
+    var viewModel = { totalPages: data.TotalPages, pageNumber: data.PageNumber }
+
+    $.ajax({
+        url: "/home/PageLinksForAuthorTab",
+        type: "GET",
+        data: viewModel,
+        success: function (data) {
+            $("#authorPageLinks").html(data);
+            pageLinksStyle();
+        },
+        error: function (data) {
+            console.log(data);
+        }
+    });
+}
+
+function UpdateBooksContentWithPage(page) {
+    $(function () {
+        var pageNumber;
+        if (page == null) {
+            pageNumber = $(".btn-primary").html();
+        } else {
+            pageNumber = page;
+        }
+
+        var viewModel = {
+            page: pageNumber
+        }
+        $.ajax({
+            url: "/api/content/GetBooksByPage",
+            type: "GET",
+            dataType: "json",
+            data: viewModel,
+            success: function (data) {
+                displayBooks(data);
+            },
+            error: function (data) {
+                var div = $("#Books");
+                div.empty();
+                var substring = "Database is empty";
+                if (data.responseText.search(substring) != -1)
+                    div.append(substring);
+            }
+        });
+    });
+}
+function UpdateAuthorsContentWithPage(page) {
+    $(function () {
+        var pageNumber;
+        if (page == null) {
+            pageNumber = $(".btn-primary").html();
+        } else {
+            pageNumber = page;
+        }
+
+        var viewModel = {
+            page: pageNumber
+        }
+        $.ajax({
+            url: "/api/content/GetAuthorsByPage",
+            type: "GET",
+            dataType: "json",
+            data: viewModel,
+            success: function (data) {
+                displayAuthors(data);
+            },
+            error: function (data) {
+                var div = $("#Authors");
+                div.empty();
+                var substring = "Database is empty";
+                if (data.responseText.search(substring) != -1)
+                    div.append(substring);
+            }
+        });
+    });
+}
+
+function pageLinksStyle() {
+    $("#bookPageLinks a:first-child").css("background-color", "#428bca");
+    $("#authorPageLinks a:first-child").css("background-color", "#428bca");
+
+    $("#bookPageLinks a").click(function () {
+        $("#bookPageLinks a").removeClass();
+        $("#bookPageLinks a").addClass("btn btn-default");
+        $("#bookPageLinks a").css("background-color", "white");
+        $(this).addClass("selected");
+        $(this).addClass("btn-primary");
+        $(this).css("background-color", "#428bca");
+    });
+    $("#authorPageLinks a").click(function () {
+        $("#authorPageLinks a").removeClass();
+        $("#authorPageLinks a").addClass("btn btn-default");
+        $("#authorPageLinks a").css("background-color", "white");
+        $(this).addClass("selected");
+        $(this).addClass("btn-primary");
+        $(this).css("background-color", "#428bca");
+    });
+}
