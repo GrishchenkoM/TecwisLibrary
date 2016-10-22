@@ -14,7 +14,7 @@ namespace Web
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
 
-            AutofacConfig.ConfigureContainer();
+            //AutofacConfig.ConfigureContainer();
 
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
