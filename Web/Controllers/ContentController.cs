@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web.Http;
 using BusinessLogic;
 using Core.Entities;
+using Web.Filters;
 using Web.Models;
 
 namespace Web.Controllers
@@ -141,11 +142,9 @@ namespace Web.Controllers
         }
 
         [Route("api/content/PostBook")]
+        [ModelValidator]
         public IHttpActionResult PostBook([FromBody] ContentModel model)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             Author author = null;
             Book book = null;
 
@@ -178,11 +177,9 @@ namespace Web.Controllers
         }
         
         [Route("api/content/PostAuthor")]
+        [ModelValidator]
         public IHttpActionResult PostAuthor([FromBody] ContentModel model)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             Author author = null;
 
             try
@@ -214,11 +211,9 @@ namespace Web.Controllers
         }
         
         [Route("api/content/PutBook")]
+        [ModelValidator]
         public IHttpActionResult PutBook([FromBody] ContentModel model)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             Author authorModel = null;
             Book bookModel = null;
 
@@ -253,11 +248,9 @@ namespace Web.Controllers
         }
 
         [Route("api/content/PutAuthor")]
+        [ModelValidator]
         public IHttpActionResult PutAuthor([FromBody] ContentModel model)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             Author author = null;
 
             try
