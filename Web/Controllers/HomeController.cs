@@ -4,8 +4,6 @@ using Web.Models;
 
 namespace Web.Controllers
 {
-    public enum State { Empty = -1 }
-
     public class HomeController : Controller
     {
         public ActionResult Index()

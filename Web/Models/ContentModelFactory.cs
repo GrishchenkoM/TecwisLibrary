@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http.Routing;
 using Core.Entities;
-using Web.Controllers;
 using Web.Models.EntityModels.Interfaces;
 
 namespace Web.Models
@@ -102,7 +101,7 @@ namespace Web.Models
 
                 viewModel.PageInfo = pageInfo;
 
-                if(CurrentId != -1 && RequestMessage != null)
+                if(CurrentId != (int)State.Empty && RequestMessage != null)
                     viewModel.Url = new UrlHelper(RequestMessage).Link("Default", new {id = CurrentId });
             }
             
@@ -130,7 +129,7 @@ namespace Web.Models
             return list;
         }
         
-        public int CurrentId { get; set; } = -1;
+        public int CurrentId { get; set; } = (int)State.Empty;
         public HttpRequestMessage RequestMessage { get; set; }
     }
 

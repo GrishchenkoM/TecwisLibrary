@@ -15,7 +15,6 @@ namespace Web.Controllers
         public ContentController(IDataManager dataManager) : base(dataManager)
         {
             _pageSize = 5;
-            SourceData.GetInstance((DataManager)dataManager); // fill DB with source info
         }
 
         [Route("api/content/GetBooks")]
@@ -44,7 +43,7 @@ namespace Web.Controllers
             try
             {
                 var book = DataManager.Books.Get(index);
-                var author = DataManager.Authors.Get(book.AuthorId);
+                var author = DataManager.Authors.Get(book.AuthorId ?? (int)State.Empty);
                 var list = new ArrayList {book, author};
                 
                 var model = ModelFactory.Create(list);

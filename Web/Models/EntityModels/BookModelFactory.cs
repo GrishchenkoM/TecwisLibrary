@@ -15,10 +15,10 @@ namespace Web.Models.EntityModels
                 Id = unit.Id,
                 Name = unit.Name,
                 Year = unit.Year,
-                AuthorId = unit.AuthorId
+                AuthorId = unit.AuthorId ?? (int)State.Empty
             };
 
-            if (CurrentId != -1 && RequestMessage != null)
+            if (CurrentId != (int)State.Empty && RequestMessage != null)
                 model.Url = new UrlHelper(RequestMessage).Link("Default", new { id = CurrentId });
 
             return model;
@@ -34,7 +34,7 @@ namespace Web.Models.EntityModels
             };
         }
 
-        public int CurrentId { get; set; } = -1;
+        public int CurrentId { get; set; } = (int)State.Empty;
         public HttpRequestMessage RequestMessage { get; set; }
     }
 
