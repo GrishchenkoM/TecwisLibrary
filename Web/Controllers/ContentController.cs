@@ -162,9 +162,13 @@ namespace Web.Controllers
                     {
                         book.AuthorId = author.Id;
                         book = DataManager.Books.Create(book);
-                    
+
+                        ModelFactory.CurrentId = book.Id;
+                        ModelFactory.RequestMessage = Request;
+
                         var entityModel = ModelFactory.Create(new ArrayList {book, author});
-                        return Created($"/api/book/{book.Id}", entityModel);
+
+                        return Created(entityModel.Url, entityModel);
                     }
                 }
 
@@ -191,8 +195,13 @@ namespace Web.Controllers
                     if (author.Id == (int)State.Empty)
                     {
                         author = DataManager.Authors.Create(author);
+
+                        ModelFactory.CurrentId = author.Id;
+                        ModelFactory.RequestMessage = Request;
+
                         var entityModel = ModelFactory.Create(new ArrayList { author });
-                        return Created($"/api/author/{author.Id}", entityModel);
+
+                        return Created(entityModel.Url, entityModel);
                     }
                     else
                     {

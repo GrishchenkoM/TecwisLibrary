@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Http;
+using System.Web.Http.Routing;
 using Core.Entities;
 using Web.Controllers;
 using Web.Models.EntityModels.Interfaces;
@@ -99,7 +101,11 @@ namespace Web.Models
                     viewModel = new ViewModel(list);
 
                 viewModel.PageInfo = pageInfo;
+
+                if(CurrentId != -1 && RequestMessage != null)
+                    viewModel.Url = new UrlHelper(RequestMessage).Link("Default", new {id = CurrentId });
             }
+            
             return viewModel;
         }
 
@@ -123,6 +129,9 @@ namespace Web.Models
 
             return list;
         }
+        
+        public int CurrentId { get; set; } = -1;
+        public HttpRequestMessage RequestMessage { get; set; }
     }
 
     public class ViewModel : IModel
@@ -138,6 +147,7 @@ namespace Web.Models
         public List<ContentModel> ContentModels { get; set; }
         public ContentModel ContentModel { get; set; }
         public PageInfo PageInfo { get; set; }
+        public string Url { get; set; }
     }
 
     public class ContentModel : IModel
@@ -157,6 +167,8 @@ namespace Web.Models
 
         [Display(Name = "Books count")]
         public int Count { get; set; }
+
+        public string Url { get; set; }
     }
 
     public class PageInfo

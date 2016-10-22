@@ -35,8 +35,12 @@ namespace Web.Controllers
 
                 if (createdEntity != null)
                 {
+                    ModelFactory.CurrentId = createdEntity.Id;
+                    ModelFactory.RequestMessage = Request;
+
                     var entityModel = ModelFactory.Create(createdEntity);
-                    return Created($"http:/localhost/api/author/{entityModel.Id}", entityModel);
+
+                    return Created(entityModel.Url, entityModel);
                 }
 
                 return InternalServerError(new Exception("Recording has not created"));

@@ -1,4 +1,6 @@
-﻿namespace Web.Models.EntityModels.Interfaces
+﻿using System.Net.Http;
+
+namespace Web.Models.EntityModels.Interfaces
 {
     public interface IModelFactory<TEntity, TModel> : IModelFactory where TModel : IModel
     {
@@ -6,7 +8,15 @@
         TEntity Create(TModel model);
     }
 
-    public interface IModelFactory { }
+    public interface IModelFactory
+    {
+        int CurrentId { get; set; }
 
-    public interface IModel { }
+        HttpRequestMessage RequestMessage { get; set; }
+    }
+
+    public interface IModel
+    {
+        string Url { get; set; }
+    }
 }

@@ -1,4 +1,6 @@
-﻿using Core.Entities;
+﻿using System.Net.Http;
+using System.Web.Http.Routing;
+using Core.Entities;
 using Web.Models.EntityModels.Interfaces;
 
 namespace Web.Models.EntityModels
@@ -8,13 +10,18 @@ namespace Web.Models.EntityModels
     {
         public BookModel Create(Book unit)
         {
-            return new BookModel()
+            var model = new BookModel()
             {
                 Id = unit.Id,
                 Name = unit.Name,
                 Year = unit.Year,
                 AuthorId = unit.AuthorId
             };
+
+            if (CurrentId != -1 && RequestMessage != null)
+                model.Url = new UrlHelper(RequestMessage).Link("Default", new { id = CurrentId });
+
+            return model;
         }
 
         public Book Create(BookModel model)
@@ -26,11 +33,15 @@ namespace Web.Models.EntityModels
                AuthorId = model.AuthorId
             };
         }
+
+        public int CurrentId { get; set; } = -1;
+        public HttpRequestMessage RequestMessage { get; set; }
     }
 
     public class BookModel : IModel
     {
         public int Id { get; set; }
+        public string Url { get; set; }
         public string Name { get; set; }
         public int AuthorId { get; set; }
         public int Year { get; set; }
